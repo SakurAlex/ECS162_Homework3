@@ -1,5 +1,27 @@
-<script>
+<script lang="ts">
+  import { onMount } from 'svelte';
   import search from './assets/search.svg';
+
+  // ——— User state & auth actions ———
+  let user: { email: string; groups?: string[] } | null = null;
+
+  async function loadUser() {
+    const res = await fetch(
+      `${import.meta.env.VITE_BASE_URL}/api/userinfo`,
+      { credentials: 'include' }
+    );
+    user = res.ok ? await res.json() : null;
+  }
+
+  function login() {
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/login`;
+  }
+
+  function logout() {
+    window.location.href = `${import.meta.env.VITE_BASE_URL}/logout`;
+  }
+
+  onMount(loadUser);
 </script>
 
 <div id="top"> <!-- Top bar -->
@@ -18,13 +40,21 @@
             <li>中文</li>
         </ul>
     </div>
-    <div>
-        <!--
-            Two buttons on the top-right corner for subscription & logging in
-        -->
-        <button>SUBSCRIBE FOR $1/WEEK</button> <!-- Subscribe button -->
-        <button>LOG IN</button> <!-- Login button -->
-    </div>
+    <div class="actions">
+    <!-- Static subscribe button -->
+    <button class="subscribe">SUBSCRIBE FOR $1/WEEK</button>
+
+    <!-- Dynamic login/logout button -->
+    {#if user}
+      <button class="auth" on:click={logout}>
+        LOG OUT ({user.email})
+      </button>
+    {:else}
+      <button class="auth" on:click={login}>
+        LOG IN
+      </button>
+    {/if}
+  </div>
 </div>
 
 <style>
@@ -63,6 +93,12 @@
     cursor: pointer;
 }
 
+/* Right-hand container for subscribe + auth buttons */
+.actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
 /* Style for action buttons */
 button {
     background-color: #5c7b95;
@@ -76,5 +112,15 @@ button {
     font-weight: 775;
     font-style: normal;
     cursor: pointer; /* Interactive cursor */
+}
+
+/* Subscribe button variation */
+.subscribe {
+  background-color: #5c7b95;
+}
+
+/* Auth button variation */
+.auth {
+  background-color: #5c7b95;
 }
 </style>

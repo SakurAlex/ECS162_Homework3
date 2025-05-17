@@ -4,6 +4,9 @@ from authlib.common.security import generate_token
 import os
 import requests
 from flask_cors import CORS
+from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
+from datetime      import datetime
 
 
 # Configure folder names via environment (with defaults)
@@ -13,8 +16,13 @@ template_path = os.getenv('TEMPLATE_PATH','templates') # Directory for HTML temp
 # Initialize Flask app, telling it where to find static files and templates
 app = Flask(__name__, static_folder=static_path, template_folder=template_path)
 
+app.config["MONGO_URI"] = os.getenv("MONGO_URI")
+mongo = PyMongo(app)
+
 # Enable CORS for API endpoints
-CORS(app)
+CORS(app,
+     supports_credentials=True,
+     origins=[os.getenv("VITE_BASE_URL", "http://localhost:5173")])
 
 # Secret key for session management
 app.secret_key = os.urandom(24)
@@ -30,7 +38,7 @@ oauth.register(
     name=os.getenv('OIDC_CLIENT_NAME'),
     client_id=os.getenv('OIDC_CLIENT_ID'),
     client_secret=os.getenv('OIDC_CLIENT_SECRET'),
-    #server_metadata_url='http://dex:5556/.well-known/openid-configuration',
+    server_metadata_url='http://dex:5556/.well-known/openid-configuration',
     authorization_endpoint="http://localhost:5556/auth",
     token_endpoint="http://dex:5556/token",
     jwks_uri="http://dex:5556/keys",
@@ -38,6 +46,12 @@ oauth.register(
     device_authorization_endpoint="http://dex:5556/device/code",
     client_kwargs={'scope': 'openid email profile'}
 )
+
+#who's logged in?
+@app.route("/api/userinfo")
+def userinfo():
+    info = oidc.user_getinfo(["email","groups"])
+    return jsonify(info)
 
 @app.route('/')
 def home():
@@ -80,6 +94,50 @@ def get_news():
     data = response.json() # Parse response as JSON
     data['response']['docs'].extend(requests.get(url + "&page=1").json()['response']['docs']) # Combine page 0 and page 1
     return jsonify(data) # Return JSON to client
+
+@app.route("/api/comments")
+def get_comments():
+    article_id = request.args.get("article_id")
+    docs = mongo.db.comments.find({"article_id": article_id})
+    out = []
+    for c in docs:
+        c["_id"] = str(c["_id"])
+        out.append(c)
+    return jsonify(out)
+
+@app.route("/api/comments", methods=["POST"])
+@oidc.require_login
+def post_comment():
+    data = request.get_json()
+    content = data.get("content", "").strip()
+    if not content:
+        abort(400)
+    user_email = oidc.user_getinfo(["email"])["email"]
+    comment = {
+        "article_id": data["article_id"],
+        "user":       user_email,
+        "content":    content,
+        "created":    datetime.utcnow().isoformat(),
+        "removed":    False
+    }
+    res = mongo.db.comments.insert_one(comment)
+    comment["_id"] = str(res.inserted_id)
+    return jsonify(comment), 201
+
+@app.route("/api/comments/<cid>", methods=["DELETE"])
+@oidc.require_login
+def delete_comment(cid):
+    info = oidc.user_getinfo(["email","groups"])
+    if "admin" not in info.get("groups", []):
+        abort(403)
+    mongo.db.comments.update_one(
+        {"_id": ObjectId(cid)},
+        {"$set": {
+            "content": "COMMENT REMOVED BY MODERATOR!",
+            "removed": True
+        }}
+    )
+    return "", 204
 
 @app.route('/') # Serve index for root
 @app.route('/<path:path>') # Serve other frontend routes
