@@ -762,32 +762,32 @@
   }
 
   .sidebar-cover {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  /* Ensure the sidebar is on the top of the page */
-  display: flex;
-  justify-content: flex-end;
-}
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    /* Ensure the sidebar is on the top of the page */
+    display: flex;
+    justify-content: flex-end;
+    overflow: hidden; /* prevent the sidebar from overflowing the page */
+  }
 
   .sidebar {
     width: 400px;
-    height: 100%;
+    height: 100vh;
     background-color: white;
     position: relative;
     font-family: "Newsreader", serif;
     font-weight: 120;
-    justify-content: space-between;
-    position: flex;
+    display: flex;
+    flex-direction: column;
   }
 
   .sidebar-header {
     padding: 1rem;
-    height: 100px;
     font-size: 1.2rem;
     font-weight: 250;
     border-bottom: 1px solid #e9e6e6;
@@ -795,6 +795,7 @@
     font-family: "Gabarito", sans-serif;
     display: flex;
     justify-content: space-between;
+    flex-shrink: 0;  /* prevent the header from being compressed */
   }
 
   .sidebar-header p {
@@ -821,6 +822,9 @@
   .sidebar-content {
     padding: 1rem;
     font-family: sans-serif;
+    overflow-y: auto;  /* add scrollbar */
+    flex-grow: 1;  /* take up the remaining space */
+    scrollbar-width: none;
   }
 
   .sidebar-content h3 {
@@ -870,6 +874,5 @@
     padding: 1rem;
     font-size: 0.9rem;
   }
-
 
 </style>
