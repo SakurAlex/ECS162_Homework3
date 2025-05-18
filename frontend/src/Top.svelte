@@ -37,12 +37,12 @@
   }
   //To ensure the user is logged out, I need to clear the session and redirect to the home page
   async function logout() {
+    toggleSidebar();
     const response = await fetch(`${baseUrl}/logout`, {credentials: 'include'});
     if (response.ok) {
       user = null;
       setContext('user', null);
       window.location.href = '/';
-      toggleSidebar();
     }
   }
 
@@ -87,7 +87,7 @@
     <div class="sidebar" on:click|stopPropagation role="dialog">
 
       <div class="sidebar-header">
-        <p>{user?.email}</p>
+        <p>{currentTitle}</p>
         <span class="close-btn" on:click={toggleSidebar}>&times;</span>
         <!--The close button for sidebar-->
       </div>

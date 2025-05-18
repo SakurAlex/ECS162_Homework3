@@ -3,9 +3,17 @@
   const BASE_URL = "http://127.0.0.1:8000";
   import { onMount, getContext } from "svelte";
   import comment from "./assets/comment.svg";
+  import Comment from "./Comment.svelte";
   const user = getContext('user');
+  let showSidebar = false;
+  let currentTitle = "";
+  let currentaid = "";
+  //The array of comments
+  let comments: any[] = [];
+  let newComment = "";
+
   
-  // Fetch data when component mounts
+  //Fetch data when component mounts
   onMount(() => {
     fetch(`${BASE_URL}/api/ucdavis-news`, {credentials: 'include'})
       .then(statusCheck) // Validate HTTP status
@@ -13,6 +21,56 @@
       .then(processData) // Populate the DOM with fetched articles
       .catch(handleError); // Handle any fetch errors
   });
+
+  function loadComments(article_id: string) {
+    fetch(`${BASE_URL}/api/comments?article_id=${encodeURIComponent(article_id)}`, { credentials: 'include' })
+      .then(statusCheck)
+      .then((resp) => resp.json())
+      .then((data) => {comments = data;})
+      .catch(handleError);
+  }
+  //AI tool helps to give inspirations on how to nest the comments
+  function nestComments(comments: any[]) {
+    const map = new Map();
+    const nested = [];
+    for (const current of comments) {
+      current.children = []; //add a children array to the current comment
+      map.set(current._id, current); //add the current comment to the map
+    }
+    for (const current of comments) {
+      if (current.parent && map.has(current.parent)) {
+        map.get(current.parent).children.push(current);
+      } else {
+        nested.push(current);
+      }
+    }
+    return nested;
+  }
+
+  $: nestedComments = nestComments(comments); //To ensure that everytime the comments are updated, the nestedComments are updated
+
+  async function submitComment(parent = null) {
+    const content = newComment;
+    if (!content) return;
+
+    const res = await fetch("/api/comments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        article_id: currentaid,
+        content,
+        parent,
+      })
+    });
+
+    if (res.ok) {
+      newComment = ""; // User can input new comment
+      await loadComments(currentaid); 
+    } else {
+      alert("fail to comment");
+    }
+  }
 
   /**
    * This function processes the data.
@@ -26,6 +84,7 @@
     const pictures = document.querySelectorAll(".picture"); // find all the <img> with class picture
     const articles = data.response.docs; // get the article list
     const readtime = document.querySelectorAll(".readtime"); // find all the <p> with class readtime
+    const comment = document.querySelectorAll(".comment"); // find all the <button> with class comment
 
     console.log("abstracts.length: ", abstracts.length);
     for (let i = 0; i < abstracts.length; i++) {
@@ -43,9 +102,20 @@
         const imageUrl = article.multimedia?.default?.url || "";
         const readtimeText =
           Math.ceil(article.word_count / 150) + " MIN READ" || "No Readtime";
-
-        //set the data to the html
-        titles[i].innerHTML = `<a href="/article?id=${encodeURIComponent(article._id)}" class="article-link">${titleText}</a>`;
+        titles[i].textContent = titleText;
+        //set the title to the sidebar
+        titles[i].addEventListener("click", () => {
+          currentTitle = titleText;
+          currentaid = article._id;  
+          showSidebar = true;
+          loadComments(article._id);
+        });
+        comment[i].addEventListener("click", () => {
+          currentTitle = titleText;
+          currentaid = article._id;
+          showSidebar = true;
+          loadComments(article._id);
+        });
 
         if (imageUrl) {
           (pictures[i] as HTMLImageElement).src = imageUrl;
@@ -78,6 +148,10 @@
   function handleError(err: Error) {
     alert("Error:" + err.message);
   }
+  function toggleSidebar() {
+    showSidebar = !showSidebar;
+  }
+
 </script>
 
 <main id="content">
@@ -519,6 +593,30 @@
   </aside>
 </main>
 
+{#if showSidebar}
+  <!--The area outsides the sidebar is covered by a gray layer-->
+  <div class="sidebar-cover" on:click={toggleSidebar} role="button">
+    <div class="sidebar" on:click|stopPropagation role="dialog">
+
+      <div class="sidebar-header">
+        <p>{currentTitle} <span>{comments.length}</span></p>
+        <span class="close-btn" on:click={toggleSidebar}>&times;</span>
+        <!--The close button for sidebar-->
+      </div>
+
+      <div class="sidebar-content">
+        <h3>Comments</h3>
+        {#each nestComments(comments) as comment} <!-- repeatedly load the comments -->
+          <CommentItem {comment} {submitComment} />
+        {/each}
+      
+        <textarea bind:value={newComment} placeholder="Share your thoughts..."></textarea>
+        <button on:click={() => submitComment()}>Post</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
   /* Layout for the content area: three columns with gaps */
   #content {
@@ -625,5 +723,53 @@
   .picture {
     width: 100%;
     height: auto;
+  }
+
+  .sidebar-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  /* Ensure the sidebar is on the top of the page */
+  display: flex;
+  justify-content: flex-end;
+}
+
+  .sidebar {
+    width: 400px;
+    height: 100%;
+    background-color: white;
+    position: relative;
+    font-family: "Newsreader", serif;
+    font-weight: 120;
+    justify-content: space-between;
+    position: flex;
+  }
+
+  .sidebar-header {
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-weight: 250;
+    border-bottom: 1px solid #e9e6e6;
+    align-items: center;
+    font-family: "Gabarito", sans-serif;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .close-btn {
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #363434;
+    padding: 0.5rem;
+  }
+
+  .sidebar-content {
+    font-size: 2.5rem;
+    padding: 2rem;
+    flex-grow: 1;
   }
 </style>
