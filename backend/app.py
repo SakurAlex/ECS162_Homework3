@@ -14,8 +14,15 @@ from datetime      import datetime
 # Configure folder names via environment (with defaults)
 static_path = os.getenv('STATIC_PATH','static') # Directory for compiled frontend assets
 template_path = os.getenv('TEMPLATE_PATH','templates') # Directory for HTML templates
-load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env')))
-
+# Load environment variables (.env cannot be automatically loaded)
+# load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env')))
+env = os.getenv('FLASK_ENV', 'development')
+# if env == 'development':
+#    load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env.dev')))
+    
+# if env == 'production':
+#    load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env.prod')))
+    # app.secret_key = os.urandom(24)
 
 # Initialize Flask app, telling it where to find static files and templates
 app = Flask(__name__, static_folder=static_path, template_folder=template_path)
@@ -23,13 +30,15 @@ NYT_API_KEY = os.getenv("NYT_API_KEY")
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
+
 # Enable CORS for API endpoints
 CORS(app,
      supports_credentials=True,
      origins=[os.getenv("VITE_BASE_URL", "http://localhost:5173")])
 
 # Secret key for session management
-app.secret_key = os.urandom(24)
+
 
 
 #initial OAuth
@@ -39,10 +48,10 @@ nonce = generate_token()
 
 
 oauth.register(
-    name=os.getenv('OIDC_CLIENT_NAME'),
-    client_id=os.getenv('OIDC_CLIENT_ID'),
-    client_secret=os.getenv('OIDC_CLIENT_SECRET'),
-    server_metadata_url='http://dex:5556/.well-known/openid-configuration',
+    name='flask_app',
+    client_id='flask-app',
+    client_secret='flask-secret',
+    # server_metadata_url='http://dex:5556/.well-known/openid-configuration',
     authorization_endpoint="http://localhost:5556/auth",
     token_endpoint="http://dex:5556/token",
     jwks_uri="http://dex:5556/keys",
@@ -118,10 +127,10 @@ def post_comment():
     content = data.get("content", "").strip()
     if not content:
         abort(400)
-    user_email = session["user"]["email"]
+    info = session["user"]
     comment = {
         "article_id": data["article_id"],
-        "user":       user_email,
+        "user":       info["email"],
         "content":    content,
         "created":    datetime.utcnow().isoformat(),
         "removed":    False
@@ -133,7 +142,7 @@ def post_comment():
 @app.route("/api/comments/<cid>", methods=["DELETE"])
 @require_login
 def delete_comment(cid):
-    user_email = session["user"]["email"]
+    info = session["user"]
     if "admin" not in info.get("groups", []):
         abort(403)
     mongo.db.comments.update_one(
