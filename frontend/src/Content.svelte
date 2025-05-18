@@ -11,6 +11,7 @@
   //The array of comments
   let comments: any[] = [];
   let newComment = "";
+  let textareaFocused = false;
 
   
   //Fetch data when component mounts
@@ -52,9 +53,8 @@
 
   $: nestedComments = nestComments(comments); //To ensure that everytime the comments are updated, the nestedComments are updated
 
-  function submitComment(parent = null) {
-    const content = newComment;
-    if (!content) return;
+  function submitComment(content: string, parent: string | null = null) {
+    if (!content.trim()) return;
 
     fetch(`${BASE_URL}/api/comments`, {
       method: "POST",
@@ -582,13 +582,24 @@
       </div>
 
       <div class="sidebar-content">
-        <h3>Comments</h3>
-        {#each nestComments(comments) as comment} <!-- repeatedly load the comments -->
+        <h3>Comments <span>{comments.length}</span></h3>
+        <div class="comment-box">
+          <!--AI tool helps to give inspirations on how to hide the submit button before click the textarea-->
+          <!--When the textarea is focused, the submit button will be shown-->
+          <!--When the textarea is blurred, the submit button will be hidden-->
+          <textarea bind:value={newComment} 
+                    placeholder="Share your thoughts..." 
+
+                    on:focus={() => textareaFocused = true}
+                    on:blur={() => {
+                      if (!newComment.trim()) textareaFocused = false;
+                    }}>
+          </textarea>
+          <button on:click={() => submitComment(newComment)}>SUBMIT</button>
+        </div>
+        {#each nestComments(comments).reverse() as comment} <!-- repeatedly load the comments -->
           <Comments {comment} {submitComment} />
         {/each}
-      
-        <textarea bind:value={newComment} placeholder="Share your thoughts..."></textarea>
-        <button on:click={() => submitComment()}>Post</button>
       </div>
     </div>
   </div>
@@ -660,6 +671,9 @@
     justify-content: space-between;
     border: 1px solid #beb3b3;
     border-radius: 15px;
+  }
+  .comment-box button {
+    align-self: flex-end;
   }
 
   .comment img {
@@ -737,7 +751,7 @@
     justify-content: space-between;
   }
   .close-btn {
-    font-size: 2rem;
+    font-size: 5rem;
     cursor: pointer;
     color: #363434;
     padding: 0.5rem;
@@ -753,6 +767,9 @@
     font-weight: bold;
     margin-bottom: 1rem;
   }
+  .sidebar-content h3 span {
+    font-weight: lighter;
+  }
 
   .sidebar-header p {
     font-weight: bold;
@@ -765,7 +782,6 @@
   .sidebar-header span {
     font-size: 0.9rem;
     color: gray;
-    margin-left: 0.5rem;
   }
 
   /* comment textbox */

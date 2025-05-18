@@ -35,9 +35,8 @@
 <style>
   .comment-item {
     border-left: 2px solid #ddd;
-    margin-left: 1rem;
-    padding-left: 1rem;
     margin-bottom: 1rem;
+    padding-left: 1rem;
   }
 
   /* user name */

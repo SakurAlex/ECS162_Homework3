@@ -145,6 +145,7 @@ def post_comment():
         "removed":    False,
         "parent":     parent_id
     }
+    print("Comment:", comment)
     res = mongo.db.comments.insert_one(comment)
     comment["_id"] = str(res.inserted_id)
     return jsonify(comment), 201
