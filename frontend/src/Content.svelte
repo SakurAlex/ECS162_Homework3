@@ -1,10 +1,12 @@
 <script lang="ts">
   // Base URL for backend API
   const BASE_URL = "http://localhost:8000";
-  import { onMount, getContext } from "svelte";
+  import { onMount, getContext, setContext } from "svelte";
   import comment from "./assets/comment.svg";
   import Comments from "./Comments.svelte";
-  const user = getContext('user');
+  
+  type User = { email: string; name: string };
+  let user: User | null = null;
   let showSidebar = false;
   let currentTitle = "";
   let currentaid = "";
@@ -13,9 +15,41 @@
   let newComment = "";
   let textareaFocused = false;
 
+  $: if (user) {
+    setContext("user", user);
+    console.log("Setting user context:", user);
+  }
+
+  function loadUser() {
+    fetch(`${BASE_URL}/api/userinfo`, {
+      credentials: 'include'
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Failed to load user');
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("User info from backend:", data);
+      console.log("User name:", data.name);
+      console.log("User email:", data.email);
+      if (data && data.email) {
+        user = data;
+      }
+    })
+    .catch((error) => {
+      console.error("Error loading user:", error);
+      user = null;
+    });
+  }
+
+  type LoadCommentsFunction = (article_id: string) => void;
+  setContext<LoadCommentsFunction>('loadComments', loadComments);
   
   //Fetch data when component mounts
   onMount(() => {
+    loadUser();
     fetch(`${BASE_URL}/api/ucdavis-news`, {credentials: 'include'})
       .then(statusCheck) // Validate HTTP status
       .then((resp) => resp.json()) // Parse JSON body
@@ -23,7 +57,7 @@
       .catch(handleError); // Handle any fetch errors
   });
 
-  function loadComments(article_id: string) {
+  export function loadComments(article_id: string) {
     fetch(`${BASE_URL}/api/comments?article_id=${encodeURIComponent(article_id)}`, { credentials: 'include' })
       .then(statusCheck)
       .then((resp) => resp.json())
@@ -53,10 +87,10 @@
 
   $: nestedComments = nestComments(comments); //To ensure that everytime the comments are updated, the nestedComments are updated
 
-  function submitComment(content: string, parent: string | null = null) {
-    if (!content.trim()) return;
+  function submitComment(content: string, parent: string | null = null): Promise<any> {
+    if (!content.trim()) return Promise.resolve();
 
-    fetch(`${BASE_URL}/api/comments`, {
+    return fetch(`${BASE_URL}/api/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -130,6 +164,7 @@
       }
     }
   }
+
   /**
    * This function checks if the response is ok.
    *
@@ -603,7 +638,7 @@
             {/if}
           </div>
         </div>
-        {#each nestComments(comments).reverse() as comment} <!-- repeatedly load the comments -->
+        {#each nestComments(comments).reverse() as comment}
           <Comments {comment} {submitComment} />
         {/each}
       </div>
@@ -757,7 +792,7 @@
     justify-content: space-between;
   }
   .close-btn {
-    font-size: 10rem;
+    font-size: 20px;
     cursor: pointer;
     color: #363434;
     padding: 0.5rem;
@@ -805,12 +840,13 @@
     display: flex;
     gap: 0.5rem;
     margin-top: 0.5rem;
+    margin-bottom: 1rem;
   }
 
   #submit {
     background-color: #5c7b95;
     color: white;
-    border: none;
+    border: 1px solid black;
     padding: 0.4rem 1rem;
     border-radius: 5px;
     font-size: 0.9rem;
@@ -821,6 +857,7 @@
   #cancel {
     background-color: #e4dfdf;
     color: black;
+    border: 1px solid black;
     border: none;
     padding: 0.4rem 1rem;
     border-radius: 5px;

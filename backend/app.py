@@ -154,7 +154,8 @@ def post_comment():
 @require_login
 def delete_comment(cid):
     info = session["user"]
-    if "admin" not in info.get("groups", []):
+    # Use AI tool to help to give admin and moderator permission to delete comments
+    if "admin" not in info.get("groups", []) and "moderator" not in info.get("groups", []):
         abort(403)
     mongo.db.comments.update_one(
         {"_id": ObjectId(cid)},

@@ -21,6 +21,8 @@ Alex Xu
         (code debug) - Why I return to localhost:8000 after successfully log in? How can I fix this problem?
         (code debug) - I returned to the correct 5173 after log in, but why it still reports fail to fetch and load the articles after the alert?
         (code debug) - After run python app.py, I got {OIDC not defined}, how can I fix this problem?
+        (tutorials) - How to ensure only admin and moderator can delete the comments?
+            - if "admin" not in info.get("groups", []) and "moderator" not in info.get("groups", []):
         (tutorials) - How can I create a sidebar in Svelte, what should I pay attention on?
             - Use a gray layer to cover the rest of the part with transparency, then write function to control the showing of sidebar. Put the sidebar at the right.
         (tutorials) - How to ensure the grey layer covered on the rest part of the page is always on the top?
