@@ -792,10 +792,13 @@
     justify-content: space-between;
   }
   .close-btn {
-    font-size: 20px;
+    font-size: 28px;
+    font-weight: bold;
     cursor: pointer;
     color: #363434;
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
   }
 
   .sidebar-content {
