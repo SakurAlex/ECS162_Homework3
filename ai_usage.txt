@@ -1,0 +1,16 @@
+Runling Li
+Alex Xu
+- What AI tool did you use?
+    - I used both Chatgpt and courseassist for support on homework 3.
+- How did you use it? What kind of questions did you ask? (include links to your conversation if applicable)
+    - Courseassist
+        - This is our requirements for homework 3.
+        - Could you provide some mongodb knowledge necessary for this homework? What should I do?
+        - According to the homework3 requirements, the process of commenting is: click on the title of the article, 
+        then another page appears with the title, and user can comment on the article. Is it correct?
+    - Chatgpt
+        - Why my console shows: Uncaught SyntaxError: The requested module '/src/Top.svelte' does not provide an export named 'user' (at Content.svelte:7:12)
+        This is my code please check is there any problem causing this error: {Top.svelte}
+        - What is getContext, why it is used instead of import { user }?
+- How much did it help you? How helpful and accurate was it?
+    - The AI provides helpful ideas to guide me wht to do in most of the time. It really depends on the way of asking the problems.

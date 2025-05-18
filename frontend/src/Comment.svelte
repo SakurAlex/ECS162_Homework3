@@ -1,7 +1,8 @@
 <script>
-  import { user } from "./Top.svelte";
+  import { getContext } from 'svelte';
+  const user = getContext('user');
   export let comment;         // { _id, user, content, created, removed }
-  export let onRemove;        // function to call when “Remove” is clicked
+  export let onRemove;        // function to call when "Remove" is clicked
 </script>
 
 <div class="comment">

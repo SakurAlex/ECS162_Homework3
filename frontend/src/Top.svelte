@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { setContext } from 'svelte';
   import search from './assets/search.svg';
 
   // ——— User state & auth actions ———
@@ -11,6 +12,7 @@
       { credentials: 'include' }
     );
     user = res.ok ? await res.json() : null;
+    setContext('user', user);  // 设置 context
   }
 
   function login() {
@@ -43,7 +45,6 @@
     <div class="actions">
     <!-- Static subscribe button -->
     <button class="subscribe">SUBSCRIBE FOR $1/WEEK</button>
-
     <!-- Dynamic login/logout button -->
     {#if user}
       <button class="auth" on:click={logout}>

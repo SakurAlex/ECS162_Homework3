@@ -1,10 +1,10 @@
 <script lang="ts">
   // Base URL for backend API
   const BASE_URL = "http://127.0.0.1:8000";
-  import { onMount } from "svelte";
+  import { onMount, getContext } from "svelte";
   import Comment from "./Comment.svelte";
   import { fetchComments, postComment, deleteComment } from "./lib/api";
-  import { user } from "./Top.svelte";
+  const user = getContext('user');
   
   let comments    = {};
   let newComment  = {};
