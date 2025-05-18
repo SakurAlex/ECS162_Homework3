@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, session, jsonify, send_from_directory
+from flask import Flask, redirect, url_for, session, jsonify, send_from_directory, request, abort
 from dotenv import load_dotenv
 from functools import wraps
 from authlib.integrations.flask_client import OAuth
@@ -37,7 +37,7 @@ else:
 # Enable CORS for API endpoints
 CORS(app,
      supports_credentials=True,
-     origins=[os.getenv("VITE_BASE_URL", "http://localhost:5173")])
+     origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
 # Secret key for session management
 
@@ -84,6 +84,10 @@ def home():
         return f"<h2>Logged in as {user['email']}</h2><a href='/logout'>Logout</a>"
     return '<a href="/login">Login with Dex</a>'
 
+@app.route("/api/ping")
+def ping():
+    return jsonify({"message": "pong"})
+
 @app.route('/login')
 def login():
     session['nonce'] = nonce
@@ -116,6 +120,7 @@ def get_news():
 @app.route("/api/comments")
 def get_comments():
     article_id = request.args.get("article_id") # get the article_id from the frontend request
+    print("Requested article_id:", article_id)
     docs = mongo.db.comments.find({"article_id": article_id}) # find where the comment are stored in mongoDB database
     out = []
     for c in docs:

@@ -1,9 +1,9 @@
 <script lang="ts">
   // Base URL for backend API
-  const BASE_URL = "http://127.0.0.1:8000";
+  const BASE_URL = "http://localhost:8000";
   import { onMount, getContext } from "svelte";
   import comment from "./assets/comment.svg";
-  import Comment from "./Comment.svelte";
+  import Comments from "./Comments.svelte";
   const user = getContext('user');
   let showSidebar = false;
   let currentTitle = "";
@@ -26,7 +26,10 @@
     fetch(`${BASE_URL}/api/comments?article_id=${encodeURIComponent(article_id)}`, { credentials: 'include' })
       .then(statusCheck)
       .then((resp) => resp.json())
-      .then((data) => {comments = data;})
+      .then((data) => {
+        console.log('Comments loaded:', data);
+        comments = data;
+      })
       .catch(handleError);
   }
   //AI tool helps to give inspirations on how to nest the comments
@@ -49,11 +52,11 @@
 
   $: nestedComments = nestComments(comments); //To ensure that everytime the comments are updated, the nestedComments are updated
 
-  async function submitComment(parent = null) {
+  function submitComment(parent = null) {
     const content = newComment;
     if (!content) return;
 
-    const res = await fetch("/api/comments", {
+    fetch(`${BASE_URL}/api/comments`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -62,14 +65,13 @@
         content,
         parent,
       })
-    });
-
-    if (res.ok) {
+    })
+    .then(statusCheck)
+    .then(() => {
       newComment = ""; // User can input new comment
-      await loadComments(currentaid); 
-    } else {
-      alert("fail to comment");
-    }
+      return loadComments(currentaid);
+    })
+    .catch(handleError);
   }
 
   /**
@@ -565,31 +567,6 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
-      <figure class="images">
-        <img class="picture" alt="Loading..." />
-        
-        <!-- Image -->
-      </figure>
-      <h2 class="title">Loading...</h2>
-      <p class="abstract"></p>
-
-      <!-- Full summary -->
-      <div class="readtime-comment">
-        <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
-          <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
-        </button>
-      </div>
-      
-    </div>
-
-    <div class="hline"></div>
-    <!-- Separator -->
-
   </aside>
 </main>
 
@@ -607,7 +584,7 @@
       <div class="sidebar-content">
         <h3>Comments</h3>
         {#each nestComments(comments) as comment} <!-- repeatedly load the comments -->
-          <CommentItem {comment} {submitComment} />
+          <Comments {comment} {submitComment} />
         {/each}
       
         <textarea bind:value={newComment} placeholder="Share your thoughts..."></textarea>
@@ -759,17 +736,58 @@
     display: flex;
     justify-content: space-between;
   }
-
   .close-btn {
-    font-size: 1.5rem;
+    font-size: 2rem;
     cursor: pointer;
     color: #363434;
     padding: 0.5rem;
   }
 
   .sidebar-content {
-    font-size: 2.5rem;
-    padding: 2rem;
-    flex-grow: 1;
+    padding: 1rem;
+    font-family: sans-serif;
   }
+
+  .sidebar-content h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-header p {
+    font-weight: bold;
+    font-size: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar-header span {
+    font-size: 0.9rem;
+    color: gray;
+    margin-left: 0.5rem;
+  }
+
+  /* comment textbox */
+  .sidebar-content textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    resize: vertical;
+  }
+
+  /* submit button for commenting */
+  .sidebar-content button {
+    background-color: #5c7b95;
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
 </style>

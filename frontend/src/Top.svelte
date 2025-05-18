@@ -87,7 +87,7 @@
     <div class="sidebar" on:click|stopPropagation role="dialog">
 
       <div class="sidebar-header">
-        <p>{currentTitle}</p>
+        <p>{user?.email}</p>
         <span class="close-btn" on:click={toggleSidebar}>&times;</span>
         <!--The close button for sidebar-->
       </div>
@@ -201,7 +201,7 @@ button {
 }
 
 .close-btn {
-  font-size: 1.5rem;
+  font-size: 2rem;
   cursor: pointer;
   color: #363434;
   padding: 0.5rem;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Comment from './Comment.svelte';
+  import Comments from './Comments.svelte';
   export let comment: any;
   export let submitComment: (content: string, parent?: string) => Promise<any>;
   let replyContent = "";
@@ -26,7 +26,7 @@
   {#if comment.children} <!-- if the comment has children -->
     <div class="replies">
       {#each comment.children as child} <!-- for each child -->
-        <Comment comment={child} {submitComment} />
+        <svelte:self comment={child} {submitComment} />
       {/each}
     </div>
   {/if}
@@ -34,12 +34,38 @@
 
 <style>
   .comment-item {
+    border-left: 2px solid #ddd;
     margin-left: 1rem;
-    border-left: 1px solid #ccc;
-    padding-left: 0.5rem;
+    padding-left: 1rem;
+    margin-bottom: 1rem;
   }
-  .user-name {
+
+  /* user name */
+  .comment-item .user-name {
     font-weight: bold;
+    font-size: 0.95rem;
+    display: inline-block;
+    margin-bottom: 0.2rem;
+  }
+
+  /* comment content */
+  .comment-item p {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  /* Reply button */
+  .comment-item button {
+    background: none;
+    color: #3b5998;
+    font-size: 0.85rem;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  /* child comment container */
+  .replies {
+    margin-top: 0.5rem;
   }
 </style>
   
