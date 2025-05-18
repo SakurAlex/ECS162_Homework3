@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, session, jsonify, send_from_directory
 from dotenv import load_dotenv
-
+from functools import wraps
 from authlib.integrations.flask_client import OAuth
 from authlib.common.security import generate_token
 import os
@@ -51,10 +51,18 @@ oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
+def require_login(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user' not in session:
+            abort(401)
+        return f(*args, **kwargs)
+    return decorated
+
 #who's logged in?
 @app.route("/api/userinfo")
 def userinfo():
-    info = oidc.user_getinfo(["email","groups"])
+    info = session["user"]
     return jsonify(info)
 
 @app.route('/')
@@ -104,13 +112,13 @@ def get_comments():
     return jsonify(out)
 
 @app.route("/api/comments", methods=["POST"])
-@oidc.require_login
+@require_login
 def post_comment():
     data = request.get_json()
     content = data.get("content", "").strip()
     if not content:
         abort(400)
-    user_email = oidc.user_getinfo(["email"])["email"]
+    user_email = session["user"]["email"]
     comment = {
         "article_id": data["article_id"],
         "user":       user_email,
@@ -123,9 +131,9 @@ def post_comment():
     return jsonify(comment), 201
 
 @app.route("/api/comments/<cid>", methods=["DELETE"])
-@oidc.require_login
+@require_login
 def delete_comment(cid):
-    info = oidc.user_getinfo(["email","groups"])
+    user_email = session["user"]["email"]
     if "admin" not in info.get("groups", []):
         abort(403)
     mongo.db.comments.update_one(
