@@ -340,7 +340,7 @@
   <!-- Divider -->
 
   <!-- Right column: mosaic + opinion -->
-  <aside class="articles">
+  <aside class="articles" id="right-column">
     <div>
 
       <figure class="images">

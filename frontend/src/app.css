@@ -22,7 +22,7 @@ body > *{
 
 /* Tablet breakpoint: hide sidebar and right divider, adjust logo and line colors */
 @media (max-width: 1024px) {
-  aside, #lineright {
+  #right-column, #lineright {
     display: none; /* Hide sidebar and right vertical line */
   }
   #vline {
@@ -37,13 +37,13 @@ body > *{
 /* Mobile breakpoint: further hide elements for narrow screens */
 @media (max-width: 767px) {
   #lineleft {
-      display: none; /* Hide left vertical divider */
+    display: none; /* Hide left vertical divider */
   }    
   #vline {
     display: none; /* Hide main vertical separator */
   }
-  #middle, aside, #languages, #trend, #date {
-      display: none; /* Hide middle column and top-bar items */
+  #middle, #languages, #trend, #date {
+    display: none; /* Hide middle column and top-bar items */
   }
 }
 
