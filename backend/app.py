@@ -73,8 +73,9 @@ def require_login(f):
 #who's logged in?
 @app.route("/api/userinfo")
 def userinfo():
-    info = session["user"]
-    return jsonify(info)
+    if 'user' not in session:
+        return jsonify({"error": "Not logged in"}), 401
+    return jsonify(session["user"])
 
 @app.route('/')
 def home():

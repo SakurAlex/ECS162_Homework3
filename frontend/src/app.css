@@ -42,7 +42,7 @@ body > *{
   #vline {
     display: none; /* Hide main vertical separator */
   }
-  #middle, #languages, #trend, #date {
+  #middle, aside, #languages, #trend, #date {
       display: none; /* Hide middle column and top-bar items */
   }
 }

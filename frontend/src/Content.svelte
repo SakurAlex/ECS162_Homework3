@@ -2,6 +2,7 @@
   // Base URL for backend API
   const BASE_URL = "http://127.0.0.1:8000";
   import { onMount, getContext } from "svelte";
+  import comment from "./assets/comment.svg";
   const user = getContext('user');
   
   // Fetch data when component mounts
@@ -83,286 +84,438 @@
   <!-- Three-column layout -->
   <!-- Left column: featured articles -->
   <section class="articles">
-    <article>
-      <div>
-        <h2 class="title">Loading...</h2>
-        <p class="abstract"></p>
-        <!-- Full summary -->
+    <div class="article">
+
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
         <p class="readtime"></p>
         <!-- Read time -->
-        <figure class="images">
-          <img class="picture" alt="Loading..." />
-          <!-- Image -->
-        </figure>
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
       </div>
+      
+    </div>
 
-      <div class="hline"></div>
-      <!-- Separator -->
+    <div class="hline"></div>
+    <!-- Separator -->
 
-      <div>
-        <h2 class="title">Loading...</h2>
-        <p class="abstract"></p>
-        <!-- Full summary -->
-        <p class="readtime"></p>
-      </div>
+    <div>
 
       <figure class="images">
         <img class="picture" alt="Loading..." />
+        
         <!-- Image -->
       </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
 
-      <div class="hline"></div>
-      <!-- Separator -->
-
-      <div>
-        <h2 class="title">Loading...</h2>
-        <p class="abstract"></p>
-        <!-- Full summary -->
+      <!-- Full summary -->
+      <div class="readtime-comment">
         <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
       </div>
+      
+    </div>
+
+    <div class="hline"></div>
+    <!-- Separator -->
+
+    <div>
 
       <figure class="images">
         <img class="picture" alt="Loading..." />
+        
         <!-- Image -->
       </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
 
-      <div class="hline"></div>
-      <!-- Separator -->
-
-      <div>
-        <h2 class="title">Loading...</h2>
-        <p class="abstract"></p>
-        <!-- Full summary -->
+      <!-- Full summary -->
+      <div class="readtime-comment">
         <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
       </div>
+      
+    </div>
+
+    <div class="hline"></div>
+    <!-- Separator -->
+
+    <div>
 
       <figure class="images">
         <img class="picture" alt="Loading..." />
+        
         <!-- Image -->
       </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
 
-      <div class="hline"></div>
-      <!-- Separator -->
-
-      <div>
-        <h2 class="title">Loading...</h2>
-        <p class="abstract"></p>
-        <!-- Full summary -->
+      <!-- Full summary -->
+      <div class="readtime-comment">
         <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
       </div>
+      
+    </div>
+
+    <div class="hline"></div>
+    <!-- Separator -->
+
+    <div>
 
       <figure class="images">
         <img class="picture" alt="Loading..." />
+        
         <!-- Image -->
       </figure>
-    </article>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
+    </div>
   </section>
 
   <!-- The line that separates the left and middle columns -->
   <div class="pline" id="lineleft"></div>
 
   <!-- Middle column: contain both images and text -->
-  <section class="images" id="middle">
-    <figure>
-      <img class="picture" alt="Loading..." />
-      <!-- Image -->
-    </figure>
+  <section class="articles" id="middle">
+    <div>
 
-    <section class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
-    </section>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
+    </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <figure>
-      <img class="picture" alt="Loading..." />
-      <!-- Image -->
-    </figure>
+    <div>
 
-    <section class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
-    </section>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
+    </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <figure>
-      <img class="picture" alt="Loading..." />
-      <!-- Image -->
-    </figure>
+    <div>
 
-    <section class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
-    </section>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
+    </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <figure>
-      <img class="picture" alt="Loading..." />
-      <!-- Image -->
-    </figure>
+    <div>
 
-    <section class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
-    </section>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
+    </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <figure>
-      <img class="picture" alt="Loading..." />
-      <!-- Image -->
-    </figure>
+    <div>
 
-    <section class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
-    </section>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
+    </div>
+
   </section>
 
   <div class="pline" id="lineright"></div>
   <!-- Divider -->
 
   <!-- Right column: mosaic + opinion -->
-  <aside>
-    <img class="picture" alt="Loading..." />
+  <aside class="articles">
+    <div>
 
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
     </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <img class="picture" alt="Loading..." />
+    <div>
 
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count"> 0</span>
+        </button>
+      </div>
+      
     </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <img class="picture" alt="Loading..." />
+    <div>
 
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
     </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <img class="picture" alt="Loading..." />
+    <div>
 
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
     </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <img class="picture" alt="Loading..." />
+    <div>
 
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
     </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <img class="picture" alt="Loading..." />
+    <div>
 
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
     </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <img class="picture" alt="Loading..." />
+    <div>
 
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+        <!-- Image -->
+      </figure>
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+      <!-- Full summary -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+        <!-- Read time -->
+        <button class="comment">
+          <img src={comment} alt="comment" />
+          <span class="comment-count">0</span>
+        </button>
+      </div>
+      
     </div>
+
     <div class="hline"></div>
+    <!-- Separator -->
 
-    <img class="picture" alt="Loading..." />
-
-    <div class="articles">
-      <article>
-        <div>
-          <h2 class="title">Loading...</h2>
-          <p class="abstract"></p>
-          <!-- Full summary -->
-          <p class="readtime"></p>
-        </div>
-      </article>
-    </div>
   </aside>
 </main>
 
@@ -378,42 +531,69 @@
   /* Article column styling */
   .articles {
     display: flex;
-    display: column;
+    flex-direction: column;
     flex: 1;
     font-family: "Newsreader", serif;
     font-optical-sizing: auto;
     font-weight: 400;
     font-style: normal;
-    gap: 1rem;
+    gap: 0.8rem;
   }
 
   /* Headline styling */
-  .articles article h2 {
+  .articles h2 {
     font-size: 1.2rem;
     cursor: pointer;
   }
 
   /* Paragraph text styling */
   .articles p {
-    margin: 0.8rem 0 0.2rem 0;
+    margin-top: 0.8rem 0 0.2rem 0;
     font-size: 1rem;
-    color: rgb(114, 110, 110);
+    color: #beb3b3;
   }
 
   /* Horizontal separator between articles */
   .hline {
     height: 0.5px;
-    background-color: rgb(175, 165, 165);
+    background-color: #beb3b3;
     margin: 1rem 0;
+  }
+
+  .readtime-comment {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   /* Read time text styling */
   .articles .readtime {
     font-family: "Lato", sans-serif;
-    margin: 0.5rem 0 0.2rem 0;
+    margin-top: 0.5rem;
     font-weight: 350;
     font-size: 0.7rem;
     font-style: normal;
+  }
+  .comment {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem;
+    height: 2rem;
+    min-width: 3.5rem;
+    background-color: white;
+    justify-content: space-between;
+    border: 1px solid #beb3b3;
+    border-radius: 15px;
+  }
+
+  .comment img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .comment-count {
+    font-size: 16px;
   }
 
   /* Image column styling */
@@ -430,7 +610,7 @@
   /* Vertical separator between columns */
   .pline {
     width: 0.5px;
-    background-color: rgb(196, 190, 190);
+    background-color: #beb3b3;
   }
 
   /* Sidebar (aside) styling */

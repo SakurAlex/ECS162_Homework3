@@ -6,14 +6,30 @@
 
   //User state & auth actions
   let user: { email: string; groups?: string[] } | null = null;
+  let showSidebar = false;
 
   async function loadUser() {
-    const res = await fetch(
-      `${baseUrl}/api/userinfo`,
-      { credentials: 'include' }
-    );
-    user = res.ok ? await res.json() : null;
-    setContext('user', user);  // set the user as user context
+    //Using AI to help me to solve the problem of the page not working after refresh
+    try {
+      const res = await fetch(
+        `${baseUrl}/api/userinfo`,
+        { credentials: 'include' }
+      );
+      if (res.ok) {
+        user = await res.json();
+        setContext('user', user);  // set the user as user context
+      } else if (res.status === 401) {
+        user = null;
+        setContext('user', null);
+      } else {
+        console.error('Failed to fetch user info:', await res.text());
+      }
+    } catch (error) {
+      console.error('Error loading user:', error);
+    }
+  }
+  function toggleSidebar() {
+    showSidebar = !showSidebar;
   }
 
   function login() {
@@ -26,8 +42,11 @@
       user = null;
       setContext('user', null);
       window.location.href = '/';
+      toggleSidebar();
     }
   }
+
+ 
 
   onMount(loadUser);
 </script>
@@ -49,27 +68,43 @@
         </ul>
     </div>
     <div class="actions">
-    <!-- Static subscribe button -->
-    <button class="subscribe">SUBSCRIBE FOR $1/WEEK</button>
     <!-- Dynamic login/logout button -->
     {#if user}
-      <button class="auth" on:click={logout}>
-        LOG OUT ({user.email})
-      </button>
+      <p id="account" on:click={toggleSidebar}>
+        Account
+      </p>
     {:else}
-      <button class="auth" on:click={login}>
+      <button on:click={login}>
         LOG IN
       </button>
     {/if}
   </div>
 </div>
 
+{#if showSidebar}
+  <!--The area outsides the sidebar is covered by a gray layer-->
+  <div class="sidebar-cover" on:click={toggleSidebar} role="button">
+    <div class="sidebar" on:click|stopPropagation role="dialog">
+
+      <div class="sidebar-header">
+        <p>{user?.email}</p>
+        <span class="close-btn" on:click={toggleSidebar}>&times;</span>
+        <!--The close button for sidebar-->
+      </div>
+
+      <div class="sidebar-content">
+        <p>Good afternoon.</p>
+        <p id="logout" on:click={logout}>Log out</p>
+      </div>
+    </div>
+  </div>
+{/if}
+
 <style>
 /* Layout for top bar: space between search, languages, and buttons */
 #top {
     display: flex;
     width: 100%;
-    font-size: 0.7rem;
     justify-content: space-between;
     align-items: center;
     max-height: 2rem;
@@ -100,7 +135,7 @@
     cursor: pointer;
 }
 
-/* Right-hand container for subscribe + auth buttons */
+/* Right-hand container for auth buttons */
 .actions {
   display: flex;
   gap: 0.4rem;
@@ -121,13 +156,83 @@ button {
     cursor: pointer; /* Interactive cursor */
 }
 
-/* Subscribe button variation */
-.subscribe {
-  background-color: #5c7b95;
+#account {  
+  color: black;
+  font-size: 1rem;
+  font-family: "Gabarito", sans-serif;
+  cursor: pointer;
+  padding-left: 8rem;
 }
 
-/* Auth button variation */
-.auth {
-  background-color: #5c7b95;
+
+.sidebar-cover {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  /* Ensure the sidebar is on the top of the page */
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sidebar {
+  width: 400px;
+  height: 100%;
+  background-color: white;
+  position: relative;
+  font-family: "Newsreader", serif;
+  font-weight: 120;
+  justify-content: space-between;
+  position: flex;
+}
+
+.sidebar-header {
+  padding: 1rem;
+  font-size: 1.2rem;
+  font-weight: 250;
+  border-bottom: 1px solid #e9e6e6;
+  align-items: center;
+  font-family: "Gabarito", sans-serif;
+  display: flex;
+  justify-content: space-between;
+}
+
+.close-btn {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #363434;
+  padding: 0.5rem;
+}
+
+.sidebar-content {
+  font-size: 2.5rem;
+  padding: 2rem;
+  padding-top: 10rem;
+  flex-grow: 1;
+}
+
+#logout {
+  color: #333;
+  font-size: 1.7rem;
+  font-weight: 775;
+  font-family: "Gabarito", sans-serif;
+  cursor: pointer;
+  position: absolute;
+  padding: 1rem;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  text-decoration: underline;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 </style>
