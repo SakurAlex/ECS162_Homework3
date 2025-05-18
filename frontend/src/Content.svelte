@@ -153,7 +153,10 @@
   function toggleSidebar() {
     showSidebar = !showSidebar;
   }
-
+  function cancelComment() {
+    newComment = "";
+    textareaFocused = false;
+  }
 </script>
 
 <main id="content">
@@ -591,11 +594,14 @@
                     placeholder="Share your thoughts..." 
 
                     on:focus={() => textareaFocused = true}
-                    on:blur={() => {
-                      if (!newComment.trim()) textareaFocused = false;
-                    }}>
+                    on:blur={() => {}}>
           </textarea>
-          <button on:click={() => submitComment(newComment)}>SUBMIT</button>
+          <div class="comment-buttons">
+            {#if textareaFocused}
+              <button id="cancel" on:click={cancelComment}>CANCEL</button>
+              <button id="submit"  on:click={() => submitComment(newComment)}>SUBMIT</button>
+            {/if}
+          </div>
         </div>
         {#each nestComments(comments).reverse() as comment} <!-- repeatedly load the comments -->
           <Comments {comment} {submitComment} />
@@ -751,7 +757,7 @@
     justify-content: space-between;
   }
   .close-btn {
-    font-size: 5rem;
+    font-size: 10rem;
     cursor: pointer;
     color: #363434;
     padding: 0.5rem;
@@ -795,8 +801,13 @@
     resize: vertical;
   }
 
-  /* submit button for commenting */
-  .sidebar-content button {
+  .comment-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  #submit {
     background-color: #5c7b95;
     color: white;
     border: none;
@@ -804,6 +815,18 @@
     border-radius: 5px;
     font-size: 0.9rem;
     cursor: pointer;
+    position: flex-end;
+  }
+
+  #cancel {
+    background-color: #e4dfdf;
+    color: black;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    position: flex-end;
   }
 
 </style>
