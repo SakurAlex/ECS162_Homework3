@@ -2,16 +2,11 @@
   // Base URL for backend API
   const BASE_URL = "http://127.0.0.1:8000";
   import { onMount, getContext } from "svelte";
-  import Comment from "./Comment.svelte";
-  import { fetchComments, postComment, deleteComment } from "./lib/api";
   const user = getContext('user');
   
-  let comments    = {};
-  let newComment  = {};
-
   // Fetch data when component mounts
   onMount(() => {
-    fetch(`${BASE_URL}/api/ucdavis-news`)
+    fetch(`${BASE_URL}/api/ucdavis-news`, {credentials: 'include'})
       .then(statusCheck) // Validate HTTP status
       .then((resp) => resp.json()) // Parse JSON body
       .then(processData) // Populate the DOM with fetched articles
@@ -49,8 +44,7 @@
           Math.ceil(article.word_count / 150) + " MIN READ" || "No Readtime";
 
         //set the data to the html
-        titles[i].innerHTML =
-          `<a href="${webUrl}" target="_blank">${titleText}</a>`;
+        titles[i].innerHTML = `<a href="/article?id=${encodeURIComponent(article._id)}" class="article-link">${titleText}</a>`;
 
         if (imageUrl) {
           (pictures[i] as HTMLImageElement).src = imageUrl;

@@ -15,22 +15,24 @@ from datetime      import datetime
 static_path = os.getenv('STATIC_PATH','static') # Directory for compiled frontend assets
 template_path = os.getenv('TEMPLATE_PATH','templates') # Directory for HTML templates
 # Load environment variables (.env cannot be automatically loaded)
-# load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env')))
+load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env')))
 env = os.getenv('FLASK_ENV', 'development')
-# if env == 'development':
-#    load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env.dev')))
+if env == 'development':
+   load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env.dev')))
     
-# if env == 'production':
-#    load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env.prod')))
-    # app.secret_key = os.urandom(24)
+if env == 'production':
+    load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env.prod')))
 
-# Initialize Flask app, telling it where to find static files and templates
+# Initialize Flask app
 app = Flask(__name__, static_folder=static_path, template_folder=template_path)
 NYT_API_KEY = os.getenv("NYT_API_KEY")
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
-app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
+if env == 'development':
+    app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
+else:
+    app.secret_key = os.urandom(24)
 
 # Enable CORS for API endpoints
 CORS(app,
@@ -94,12 +96,12 @@ def authorize():
 
     user_info = oauth.flask_app.parse_id_token(token, nonce=nonce)  # or use .get('userinfo').json()
     session['user'] = user_info
-    return redirect('/')
+    return redirect('http://localhost:5173/')
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect('/')
+    return jsonify({"status": "success"}), 200
 
 
 @app.route('/api/ucdavis-news') # API endpoint to fetch UC Davis–related articles
@@ -112,8 +114,8 @@ def get_news():
 
 @app.route("/api/comments")
 def get_comments():
-    article_id = request.args.get("article_id")
-    docs = mongo.db.comments.find({"article_id": article_id})
+    article_id = request.args.get("article_id") # get the article_id from the frontend request
+    docs = mongo.db.comments.find({"article_id": article_id}) # find where the comment are stored in mongoDB database
     out = []
     for c in docs:
         c["_id"] = str(c["_id"])
@@ -125,6 +127,7 @@ def get_comments():
 def post_comment():
     data = request.get_json()
     content = data.get("content", "").strip()
+    parent_id = data.get("parent") # get the parent_id from the frontend, therefore the comment can be nested
     if not content:
         abort(400)
     info = session["user"]
@@ -133,7 +136,8 @@ def post_comment():
         "user":       info["email"],
         "content":    content,
         "created":    datetime.utcnow().isoformat(),
-        "removed":    False
+        "removed":    False,
+        "parent":     parent_id
     }
     res = mongo.db.comments.insert_one(comment)
     comment["_id"] = str(res.inserted_id)
@@ -153,6 +157,18 @@ def delete_comment(cid):
         }}
     )
     return "", 204
+
+@app.route('/api/article/<article_id>')
+def get_article(article_id):
+    try:
+        url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?fq=_id:{article_id}&api-key={NYT_API_KEY}"
+        response = requests.get(url)
+        data = response.json()
+        if data['response']['docs']:
+            return jsonify(data['response']['docs'][0])
+        return jsonify({'error': 'Article not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/') # Serve index for root
 @app.route('/<path:path>') # Serve other frontend routes

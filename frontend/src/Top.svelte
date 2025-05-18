@@ -2,25 +2,31 @@
   import { onMount } from 'svelte';
   import { setContext } from 'svelte';
   import search from './assets/search.svg';
+  const baseUrl = import.meta.env.VITE_BASE_URL ?? 'http://localhost:8000';
 
-  // ——— User state & auth actions ———
+  //User state & auth actions
   let user: { email: string; groups?: string[] } | null = null;
 
   async function loadUser() {
     const res = await fetch(
-      `${import.meta.env.VITE_BASE_URL}/api/userinfo`,
+      `${baseUrl}/api/userinfo`,
       { credentials: 'include' }
     );
     user = res.ok ? await res.json() : null;
-    setContext('user', user);  // 设置 context
+    setContext('user', user);  // set the user as user context
   }
 
   function login() {
-    window.location.href = `${import.meta.env.VITE_BASE_URL}/login`;
+    window.location.href = `${baseUrl}/login`;
   }
-
-  function logout() {
-    window.location.href = `${import.meta.env.VITE_BASE_URL}/logout`;
+  //To ensure the user is logged out, I need to clear the session and redirect to the home page
+  async function logout() {
+    const response = await fetch(`${baseUrl}/logout`, {credentials: 'include'});
+    if (response.ok) {
+      user = null;
+      setContext('user', null);
+      window.location.href = '/';
+    }
   }
 
   onMount(loadUser);
