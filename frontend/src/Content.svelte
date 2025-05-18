@@ -14,6 +14,11 @@
   let comments: any[] = [];
   let newComment = "";
   let textareaFocused = false;
+  let commentCount = 0;
+
+  $: {
+    commentCount = comments.filter(c => !c.removed).length;
+  }
 
   $: if (user) {
     setContext("user", user);
@@ -614,13 +619,12 @@
     <div class="sidebar" on:click|stopPropagation role="dialog">
 
       <div class="sidebar-header">
-        <p>{currentTitle} <span>{comments.length}</span></p>
-        <span class="close-btn" on:click={toggleSidebar}>&times;</span>
-        <!--The close button for sidebar-->
+        <p>{currentTitle} <span class="comment-count">{commentCount}</span></p>
+        <button class="close-btn" on:click={toggleSidebar}>&times;</button>
       </div>
 
       <div class="sidebar-content">
-        <h3>Comments <span>{comments.length}</span></h3>
+        <h3>Comments <span>{commentCount}</span></h3>
         <div class="comment-box">
           <!--AI tool helps to give inspirations on how to hide the submit button before click the textarea-->
           <!--When the textarea is focused, the submit button will be shown-->
@@ -783,6 +787,7 @@
 
   .sidebar-header {
     padding: 1rem;
+    height: 100px;
     font-size: 1.2rem;
     font-weight: 250;
     border-bottom: 1px solid #e9e6e6;
@@ -791,14 +796,26 @@
     display: flex;
     justify-content: space-between;
   }
-  .close-btn {
-    font-size: 28px;
+
+  .sidebar-header p {
     font-weight: bold;
+    font-size: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar-header .comment-count {
+    font-size: 0.9rem;
+    color: gray;
+  }
+
+  .close-btn {
+    font-size: 2rem;
     cursor: pointer;
-    color: #363434;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    background-color: none;
+    border: none;
+    padding: 0.5rem;
   }
 
   .sidebar-content {
@@ -813,30 +830,6 @@
   }
   .sidebar-content h3 span {
     font-weight: lighter;
-  }
-
-  .sidebar-header p {
-    font-weight: bold;
-    font-size: 1rem;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .sidebar-header span {
-    font-size: 0.9rem;
-    color: gray;
-  }
-
-  /* comment textbox */
-  .sidebar-content textarea {
-    width: 100%;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 0.6rem;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    resize: vertical;
   }
 
   .comment-buttons {
@@ -868,5 +861,15 @@
     cursor: pointer;
     position: flex-end;
   }
+
+  /* comment textbox */
+  .sidebar-content textarea {
+    width: 100%;
+    border: 1px solid gray;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
 
 </style>

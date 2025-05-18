@@ -20,19 +20,38 @@
     replying = false;
   }
   async function deleteComment(commentId: string) {
-    if (!confirm("Are you sure you want to delete this comment?")) return;
+    try {
+      const response = await fetch(`http://localhost:8000/api/comments/${commentId}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
 
-    await fetch(`http://localhost:8000/api/comments/${commentId}`, {
-      method: "DELETE",
-      credentials: "include"
-    });
+      if (!response.ok) {
+        throw new Error(`Failed to delete comment: ${response.status}`);
+      }
 
-    await loadComments(currentaid);
+      // Immediately update the comment content and state
+      comment.content = "COMMENT REMOVED BY MODERATOR!";
+      comment.removed = true;
+      comment = comment; // Trigger Svelte reactivity
+
+      // Update parent's comments array
+      const updatedComments = await fetch(`${BASE_URL}/api/comments?article_id=${currentaid}`, { 
+        credentials: 'include' 
+      }).then(res => res.json());
+      
+      comments = updatedComments;
+
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
   }
 </script>
 
 <div class="comment-item">
-  <p><span class="user-name">{comment.user}</span>: {comment.content}</p>
+  
+  <p class="user-name">{comment.user}</p>
+  <p class="content" class:removed={comment.removed}>{comment.content}</p>
 
   <div class="comment-actions">
     <div class="left-actions">
@@ -87,7 +106,17 @@
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+    width: 100%;
   }
+
+  .left-actions textarea {
+    width: 100%;
+    border: 1px solid gray;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
 
   .right-actions {
     display: flex;
@@ -127,6 +156,11 @@
   /* child comment container */
   .replies {
     margin-top: 0.5rem;
+  }
+
+  .removed {
+    color: #999;
+    font-style: italic;
   }
 </style>
   
