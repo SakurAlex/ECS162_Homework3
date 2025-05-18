@@ -1,4 +1,6 @@
 from flask import Flask, redirect, url_for, session, jsonify, send_from_directory
+from dotenv import load_dotenv
+
 from authlib.integrations.flask_client import OAuth
 from authlib.common.security import generate_token
 import os
@@ -12,10 +14,12 @@ from datetime      import datetime
 # Configure folder names via environment (with defaults)
 static_path = os.getenv('STATIC_PATH','static') # Directory for compiled frontend assets
 template_path = os.getenv('TEMPLATE_PATH','templates') # Directory for HTML templates
+load_dotenv(dotenv_path=os.path.abspath(os.path.join(os.path.dirname(__file__), '../.env')))
+
 
 # Initialize Flask app, telling it where to find static files and templates
 app = Flask(__name__, static_folder=static_path, template_folder=template_path)
-
+NYT_API_KEY = os.getenv("NYT_API_KEY")
 app.config["MONGO_URI"] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
 
@@ -80,18 +84,12 @@ def logout():
     session.clear()
     return redirect('/')
 
-@app.route('/api/key')
-def get_api_key():
-    # grab it from the environment
-    key = os.getenv('NYT_API_KEY','')
-    return jsonify({'api_key': key})
 
 @app.route('/api/ucdavis-news') # API endpoint to fetch UC Davis–related articles
 def get_news():
-    # Build the request URL with query parameters and API key
-    url = "https://api.nytimes.com/svc/search/v2/articlesearch.json?q=%22UC%20Davis%22&api-key=w4rcy5YA6GG99HeECAyyBwmfzARZefFx"
-    response = requests.get(url) # Perform HTTP GET
-    data = response.json() # Parse response as JSON
+    url = f"https://api.nytimes.com/svc/search/v2/articlesearch.json?q=%22UC%20Davis%22&api-key={NYT_API_KEY}"
+    response = requests.get(url)
+    data = response.json()
     data['response']['docs'].extend(requests.get(url + "&page=1").json()['response']['docs']) # Combine page 0 and page 1
     return jsonify(data) # Return JSON to client
 
