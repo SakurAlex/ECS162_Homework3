@@ -47,9 +47,10 @@
       }
 
       // Update the comment's content to show it was removed
+      // AI tool helps to give inspirations on how to update the comments immediately
       comment.content = "COMMENT REMOVED BY MODERATOR!";
       comment.removed = true;
-      comment = comment; // Trigger Svelte reactivity
+      comment = comment;
 
       // Fetch updated comments list
       const updatedComments = await fetch(`${BASE_URL}/api/comments?article_id=${currentaid}`, { 
@@ -64,43 +65,69 @@
   }
 
   function redactComment(original: string, edited: string): string {
-    let redacted = '';
-    
-    if (edited.length > original.length) {
-      alert("You can only redact the content, not add more!");
-      return original;
-    }
-    //iteratively check each character with the original content
-    let i = 0, j = 0; //using greedy algorithm to check each character
-    while (i < original.length) {
-      if (j < edited.length && original[i] === edited[j]) {
-        //If the character is the same, add it to the redacted content
-        redacted += original[i];
-        i++;
-        j++;
-      } else {
-        //If the character is different, add a full block to the redacted content
-        redacted += "█"; // full block U+2588
-        i++;
+    try {
+      let redacted = '';
+        
+      if (edited.length > original.length) {
+        alert("You can only redact the content, not add more!");
+        return original;
       }
-    }
-    //If the edited content is not the same length as the original, return the original content
-    if (j < edited.length) {
-      alert("Invalid redaction!");
+      //iteratively check each character with the original content
+      let i = 0, j = 0; //using greedy algorithm to check each character
+      while (i < original.length) {
+        if (j < edited.length && original[i] === edited[j]) {
+          //If the character is the same, add it to the redacted content
+          redacted += original[i];
+          i++;
+          j++;
+        } else {
+          //If the character is different, add a full block to the redacted content
+          redacted += "█"; // full block U+2588
+          i++;
+        }
+      }
+      //If the edited content is not the same length as the original, return the original content
+      if (j < edited.length) {
+        alert("Invalid redaction!");
+        return original;
+      }
+
+      return redacted;
+    } catch (error) {
+      console.error("Error redacting comment:", error);
       return original;
     }
-
-    return redacted;
   }
 
   async function handleRedact() {
+    //check if the comment has already been removed
+    if (comment.removed) {
+      alert("This comment has already been removed by moderator!");
+      redacting = false;
+      return;
+    }
+
     const redacted = redactComment(comment.content, redactContent);
-    await fetch(`http://localhost:8000/api/comments/${comment._id}`, {
+    const response = await fetch(`http://localhost:8000/api/comments/${comment._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" }, //specify the content type as json
       credentials: "include",
       body: JSON.stringify({ content: redacted }) //send the redacted content to the backend
     });
+
+    if (!response.ok) {
+        throw new Error(`Failed to redact comment: ${response.status}`);
+    }
+    //update the comment content
+    comment.content = redacted;
+    comment = comment; 
+
+    // Fetch updated comments list
+    const updatedComments = await fetch(`${BASE_URL}/api/comments?article_id=${currentaid}`, { 
+        credentials: 'include' 
+      }).then(res => res.json());
+      
+      comments = updatedComments;
 
     redacting = false;
     await loadComments(currentaid);
@@ -117,17 +144,17 @@
   <div class="comment-buttons">
     {#if replying}
       <!-- Reply input form -->
+      <textarea bind:value={replyContent}></textarea>
       <div class="submit-and-cancel">
-        <textarea bind:value={replyContent}></textarea>
         <button class="submit-button" on:click={handleReply}>Submit</button>
         <button class="cancel-button" on:click={() => replying = false}>Cancel</button>
       </div>  
     {:else if redacting}
       <!-- Redact input form -->
+      <textarea bind:value={redactContent}></textarea>
       <div class="submit-and-cancel">
-        <textarea bind:value={redactContent}></textarea>
-        <button on:click={handleRedact}>Confirm</button>
-        <button on:click={() => redacting = false}>Cancel</button>
+        <button class="submit-button" on:click={handleRedact}>Confirm</button>
+        <button class="cancel-button" on:click={() => redacting = false}>Cancel</button>
       </div>
     {:else}
       <!--if NOT replying or redacting, only reply redact and delete buttons are comment-actions-->

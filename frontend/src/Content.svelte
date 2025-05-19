@@ -4,7 +4,7 @@
   import { onMount, getContext, setContext } from "svelte";
   import comment from "./assets/comment.svg";
   import Comments from "./Comments.svelte";
-  
+  //User information, type required by the typescript
   type User = { email: string; name: string };
   let user: User | null = null;
   let showSidebar = false;
@@ -12,29 +12,40 @@
   let currentaid = "";
   //The array of comments
   let comments: any[] = [];
+  //The new comment input for the user
   let newComment = "";
   let textareaFocused = false;
+  //The number of comments
   let commentCount = 0;
 
+  // $ ensure that the commentCount is updated whenever the comments are updated
   $: {
+    //To count the number of comments that are not removed by the moderator
     commentCount = comments.filter(c => !c.removed).length;
   }
-
+  //To set the user context
   $: if (user) {
     setContext("user", user);
     console.log("Setting user context:", user);
   }
 
+  /*
+   * This function loads the user information.
+   *
+   * @returns {Promise<void>} - A promise that resolves when the user information is loaded.
+   */
   function loadUser() {
     fetch(`${BASE_URL}/api/userinfo`, {
       credentials: 'include'
     })
+    //To check if the user is loaded
     .then(res => {
       if (!res.ok) {
         throw new Error('Failed to load user');
       }
       return res.json();
     })
+    //To log the user information
     .then(data => {
       console.log("User info from backend:", data);
       console.log("User name:", data.name);
@@ -49,10 +60,14 @@
     });
   }
 
+  //To set the loadComments function to the context
+  //Type required by the typescript
   type LoadCommentsFunction = (article_id: string) => void;
   setContext<LoadCommentsFunction>('loadComments', loadComments);
   
-  //Fetch data when component mounts
+  /*
+   * This function loads the user information and the articles.
+   */
   onMount(() => {
     loadUser();
     fetch(`${BASE_URL}/api/ucdavis-news`, {credentials: 'include'})
@@ -62,6 +77,12 @@
       .catch(handleError); // Handle any fetch errors
   });
 
+  /*
+   * This function loads the comments for a given article.
+   *
+   * @param {string} article_id - The ID of the article to load comments for.
+   * @returns {Promise<void>} - A promise that resolves when the comments are loaded.
+   */
   export function loadComments(article_id: string) {
     fetch(`${BASE_URL}/api/comments?article_id=${encodeURIComponent(article_id)}`, { credentials: 'include' })
       .then(statusCheck)
@@ -72,7 +93,14 @@
       })
       .catch(handleError);
   }
+
   //AI tool helps to give inspirations on how to nest the comments
+  /*
+   * This function nests the comments.
+   *
+   * @param {any[]} comments - The comments to nest.
+   * @returns {any[]} - The nested comments.
+   */
   function nestComments(comments: any[]) {
     const map = new Map();
     const nested = [];
@@ -92,6 +120,13 @@
 
   $: nestedComments = nestComments(comments); //To ensure that everytime the comments are updated, the nestedComments are updated
 
+  /*
+   * This function submits a comment.
+   *
+   * @param {string} content - The content of the comment.
+   * @param {string} parent - The parent of the comment.
+   * @returns {Promise<any>} - A promise that resolves when the comment is submitted.
+   */
   function submitComment(content: string, parent: string | null = null): Promise<any> {
     if (!content.trim()) return Promise.resolve();
 
@@ -113,7 +148,12 @@
     .catch(handleError);
   }
 
-/** Fetch the # of comments for one article and update its <span> */
+/*
+ * This function fetches the number of comments for a given article and updates the comment count.
+ *
+ * @param {string} articleId - The ID of the article to fetch the comment count for.
+ * @returns {Promise<void>} - A promise that resolves when the comment count is fetched and updated.
+ */
 async function fetchCommentCount(articleId: string) {
 const res = await fetch(
    `${BASE_URL}/api/comments?article_id=${encodeURIComponent(articleId)}`,
@@ -129,7 +169,7 @@ if (span) span.textContent = String(data.length);
 }
 
   /**
-   * This function processes the data.
+   * This function processes the data from the backend (New York Times API).
    *
    * @param {any} data - The data from the fetch request.
    */
@@ -166,14 +206,17 @@ if (span) span.textContent = String(data.length);
           showSidebar = true;
           loadComments(article._id);
         });
+        //set the data-article-id to the button
         const btn = commentButtons[i] as HTMLButtonElement; 
         btn.setAttribute("data-article-id", article._id); 
+        //set the click event to the button
         btn.addEventListener("click", () => {
           currentTitle = titleText;
           currentaid = article._id;
           showSidebar = true;
           loadComments(article._id);
         });
+        //fetch the comment count
         fetchCommentCount(article._id).catch(console.error);
 
         if (imageUrl) {
@@ -737,7 +780,7 @@ if (span) span.textContent = String(data.length);
   }
   .comment-box button {
     align-self: flex-end;
-    font-family: "Gabarito", sans-serif;
+    font-family: "Newsreader", serif;
   }
 
   .comment img {
@@ -833,7 +876,7 @@ if (span) span.textContent = String(data.length);
   .close-btn {
     font-size: 2rem;
     cursor: pointer;
-    background-color: none;
+    background-color: white;
     border: none;
     padding: 0.5rem;
   }
