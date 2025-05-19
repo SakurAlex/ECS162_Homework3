@@ -171,8 +171,8 @@ def delete_comment(cid):
         abort(404)  # Comment not found
     return "", 204
 
-# patch method to update only parts of the comment
-@app.route("/api/comments/<cid>", methods=["PATCH"]) # it requires <cid> as a parameter
+# put method to update only parts of the comment
+@app.route("/api/comments/<cid>", methods=["PUT"]) # it requires <cid> as a parameter
 @require_login
 def redact_comment(cid):
     info = session["user"]
