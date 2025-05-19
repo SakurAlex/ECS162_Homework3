@@ -265,20 +265,26 @@ if (span) span.textContent = String(data.length);
   <!-- Left column: featured articles -->
   <section class="articles">
     <div class="article">
-
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -289,21 +295,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -314,21 +326,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -339,21 +357,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -364,27 +388,34 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
       </div>
       
     </div>
+
   </section>
 
   <!-- The line that separates the left and middle columns -->
@@ -392,21 +423,27 @@ if (span) span.textContent = String(data.length);
 
   <!-- Middle column: contain both images and text -->
   <section class="articles" id="middle">
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -417,21 +454,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -442,21 +485,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -467,21 +516,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -492,21 +547,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -521,21 +582,27 @@ if (span) span.textContent = String(data.length);
 
   <!-- Right column: mosaic + opinion -->
   <aside class="articles" id="right-column">
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -546,21 +613,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -571,21 +644,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -596,21 +675,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -621,21 +706,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -646,21 +737,27 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>

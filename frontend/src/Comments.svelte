@@ -25,7 +25,9 @@
   
   console.log("Current user in Comments:", user);
 
-  // Handle reply submission
+ /*
+  * This function handles the reply submission by the users.
+  */
   async function handleReply() {   
     if (replyContent.trim() === "") return;
     await submitComment(replyContent, comment._id);  // Submit reply with parent comment ID
@@ -33,7 +35,9 @@
     replying = false;   // Hide reply form
   }
 
-  // Handle comment deletion (moderator/admin only)
+  /*
+   * This function handles the comment deletion after the moderator or admin confirm deletion.
+   */
   async function deleteComment(commentId: string) {
     try {
       // Send DELETE request to backend
@@ -64,6 +68,9 @@
     }
   }
 
+  /*
+   * This function redacts the comment by the moderator or admin after they confirm the redaction.
+   */
   function redactComment(original: string, edited: string): string {
     try {
       let redacted = '';
@@ -99,6 +106,9 @@
     }
   }
 
+  /*
+   * This function handles the redaction of the comment by the moderator or admin after they confirm the redaction.
+   */
   async function handleRedact() {
     //check if the comment has already been removed
     if (comment.removed) {
@@ -201,7 +211,8 @@
   /* Layout for action buttons */
   .comment-buttons, .submit-and-cancel {
     display: flex;
-    justify-content: space-between;
+    width: 100%;
+    justify-content: flex-start;
     align-items: center;
     margin-top: 0.5rem;
   }
@@ -247,5 +258,7 @@
     color: #999; /*gray color is removed by the moderator*/
     font-style: italic;
   }
+
+
 </style>
   
