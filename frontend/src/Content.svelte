@@ -737,6 +737,7 @@ if (span) span.textContent = String(data.length);
   }
   .comment-box button {
     align-self: flex-end;
+    font-family: "Gabarito", sans-serif;
   }
 
   .comment img {
