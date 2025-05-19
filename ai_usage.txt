@@ -87,3 +87,6 @@ Wire the same click-handler you already had.
 Call fetchCommentCount(article._id) immediately after wiring each button to overwrite the hard-coded “0” in its <span class="comment-count">.
 How much did it help you? How helpful and accurate was it?
 It really helped me a lot, and I finished coding by his instruction very easiely, and passed the test too, it indeed acomplished my goal, very nice. And I learned and practiced this part of the logic during my coding process.
+
+Because of the lack of experience in pytest, asked chatgpt how to build it, and debugged with him.
+asked chatgpt how to show the code coverages of my unit test, and I got responde that use the pytest_cov tool, I added it in my requirements file and it works really well, it indeed helped me a lot, and I defnitely will keep this in mind in the future, really helpful.
