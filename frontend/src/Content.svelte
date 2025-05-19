@@ -113,6 +113,21 @@
     .catch(handleError);
   }
 
+/** Fetch the # of comments for one article and update its <span> */
+async function fetchCommentCount(articleId: string) {
+const res = await fetch(
+   `${BASE_URL}/api/comments?article_id=${encodeURIComponent(articleId)}`,
+   { credentials: "include" }
+);
+if (!res.ok) throw new Error(`Couldn't fetch comments for ${articleId}`);
+const data: any[] = await res.json();
+// find the <span class="comment-count"> under the button with matching data-article-id
+const span = document.querySelector(
+  `button.comment[data-article-id="${articleId}"] .comment-count`
+);
+if (span) span.textContent = String(data.length);
+}
+
   /**
    * This function processes the data.
    *
@@ -125,7 +140,7 @@
     const pictures = document.querySelectorAll(".picture"); // find all the <img> with class picture
     const articles = data.response.docs; // get the article list
     const readtime = document.querySelectorAll(".readtime"); // find all the <p> with class readtime
-    const comment = document.querySelectorAll(".comment"); // find all the <button> with class comment
+    const commentButtons = document.querySelectorAll("button.comment");
 
     console.log("abstracts.length: ", abstracts.length);
     for (let i = 0; i < abstracts.length; i++) {
@@ -151,12 +166,15 @@
           showSidebar = true;
           loadComments(article._id);
         });
-        comment[i].addEventListener("click", () => {
+        const btn = commentButtons[i] as HTMLButtonElement; 
+        btn.setAttribute("data-article-id", article._id); 
+        btn.addEventListener("click", () => {
           currentTitle = titleText;
           currentaid = article._id;
           showSidebar = true;
           loadComments(article._id);
         });
+        fetchCommentCount(article._id).catch(console.error);
 
         if (imageUrl) {
           (pictures[i] as HTMLImageElement).src = imageUrl;
@@ -219,7 +237,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -244,7 +262,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -269,7 +287,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -294,7 +312,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -319,7 +337,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -347,7 +365,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -372,7 +390,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -397,7 +415,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -422,7 +440,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -447,7 +465,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -476,7 +494,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -501,7 +519,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count"> 0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -526,7 +544,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -551,7 +569,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -576,7 +594,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -601,7 +619,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       

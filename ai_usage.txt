@@ -1,5 +1,5 @@
 Runling Li
-Alex Xu
+
 - What AI tool did you use?
     - I used both Chatgpt and courseassist for support on homework 3.
 - How did you use it? What kind of questions did you ask? (include links to your conversation if applicable)
@@ -62,3 +62,21 @@ Alex Xu
     - The AI provides helpful ideas to guide me wht to do in most of the time. It really depends on the way of asking the problems.
     - In addition, it provides idea about debugging when I cannot figure out where is the mistake. I prefer to ask the AI any cause of the error message.
     - When I am not familiar with the functionalities of the tools, AI can provide summary about it.
+    
+Alex Ma:
+AI_Tool: Chat_Gpt
+Prompt: Asking chatgpt that why my comment box always shows that the comment amount is 0, and given the whole content.svelte file to him
+Answer: 
+Here’s what you need to do, step by step:
+
+Add a fetchCommentCount(articleId) helper right after your submitComment function—this fetches the comments array and returns its length.
+
+In processData, renam your const comment to const commentButtons so it’s clear these are buttons.
+
+Tag each button with data-article-id="…" so we can target it later.
+
+Wire the same click-handler you already had.
+
+Call fetchCommentCount(article._id) immediately after wiring each button to overwrite the hard-coded “0” in its <span class="comment-count">.
+How much did it help you? How helpful and accurate was it?
+It really helped me a lot, and I finished coding by his instruction very easiely, and passed the test too, it indeed acomplished my goal, very nice. And I learned and practiced this part of the logic during my coding process.
