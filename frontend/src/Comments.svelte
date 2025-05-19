@@ -73,8 +73,10 @@
    */
   function redactComment(original: string, edited: string): string {
     try {
+      console.log("Original content:", original);
+      console.log("Edited content:", edited);
       let redacted = '';
-        
+      
       if (edited.length > original.length) {
         alert("You can only redact the content, not add more!");
         return original;
@@ -90,9 +92,11 @@
         } else {
           //If the character is different, add a full block to the redacted content
           redacted += "█"; // full block U+2588
+          console.log("Redacting", redacted);
           i++;
         }
       }
+      console.log("Redacted result:", redacted);
       //If the edited content is not the same length as the original, return the original content
       if (j < edited.length) {
         alert("Invalid redaction!");
@@ -117,7 +121,11 @@
       return;
     }
 
+    console.log("Before redaction - comment content:", comment.content);
+    console.log("Redact content:", redactContent);
     const redacted = redactComment(comment.content, redactContent);
+    console.log("After redaction - redacted content:", redacted);
+
     const response = await fetch(`http://localhost:8000/api/comments/${comment._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" }, //specify the content type as json
@@ -132,15 +140,7 @@
     comment.content = redacted;
     comment = comment; 
 
-    // Fetch updated comments list
-    const updatedComments = await fetch(`${BASE_URL}/api/comments?article_id=${currentaid}`, { 
-        credentials: 'include' 
-      }).then(res => res.json());
-      
-      comments = updatedComments;
-
     redacting = false;
-    await loadComments(currentaid);
   }
 
 </script>
@@ -230,16 +230,23 @@
 
   /* Reply and submit button styling */
   .reply-button, .submit-button {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 6px;
+    margin-left: 8px;
     color: #3b5998;
   }
 
   /* Delete and cancel button styling */
-  .delete-button, .cancel-button, .redact-button {
-    padding: 4px 8px !important;
+  .delete-button, .cancel-button {
+    font-size: 0.8rem;
+    padding: 4px 8px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     margin-left: 8px;
-    color: #686868 !important;
+    color: white;
+    border: grey;
   }
 
   /* Comment text styling */
