@@ -17,11 +17,11 @@
   export let comments: any[];  // Array of all comments
   export let submitComment: (content: string, parent?: string) => Promise<any>;  // Function to submit new comments
 
-  // Local state for reply functionality
+ 
   let replyContent = "";
   let replying = false;
 
-  console.log("Current user in Comments (from context):", user);
+  console.log("Current user in Comments:", user);
 
   // Handle reply submission
   async function handleReply() {   

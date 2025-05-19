@@ -150,7 +150,8 @@ def post_comment():
     comment["_id"] = str(res.inserted_id)
     return jsonify(comment), 201
 
-@app.route("/api/comments/<cid>", methods=["DELETE"])
+# delete method to delete the comment as admin and moderator
+@app.route("/api/comments/<cid>", methods=["DELETE"]) # it requires <cid> as a parameter
 @require_login
 def delete_comment(cid):
     info = session["user"]
@@ -168,8 +169,31 @@ def delete_comment(cid):
     
     if result.modified_count == 0:
         abort(404)  # Comment not found
-        
     return "", 204
+
+# patch method to update only parts of the comment
+@app.route("/api/comments/<cid>", methods=["PATCH"]) # it requires <cid> as a parameter
+@require_login
+def redact_comment(cid):
+    info = session["user"]
+    if info.get("name") not in ["admin", "moderator"]:
+        abort(403)
+
+    data = request.get_json() # get the content from the frontend
+    content = data.get("content", "").strip()
+    if not content:
+        abort(400)
+
+    # replace the selected text with a full block (U+2588).
+    redacted = ''.join('█' if c != ' ' else ' ' for c in content)
+
+    # update the content of the comment in the mongodb database
+    mongo.db.comments.update_one(
+        {"_id": ObjectId(cid)},
+        {"$set": {"content": redacted, "removed": False}}
+    )
+    return jsonify({"status": "redacted"}), 200
+    
 
 @app.route('/api/article/<article_id>')
 def get_article(article_id):
