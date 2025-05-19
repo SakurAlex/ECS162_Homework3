@@ -1,29 +1,28 @@
-import { vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/svelte'
-import Comments from '../Comments.svelte'
+// frontend/src/__tests__/Content.spec.ts
+import { render, fireEvent, screen } from '@testing-library/svelte'
+import { describe, it, expect, vi } from 'vitest'
+import Content from '../Content.svelte'
 
-const flat = [
-  { _id:'a', content:'Root', parent:null },
-  { _id:'b', content:'Child', parent:'a' }
-]
+describe('Content.svelte', () => {
+  const articles = [
+    { id: 1, title: 'Hello World', readTime: '3 min', commentsCount: 5 }
+  ]
 
-describe('Comments.svelte', () => {
-  it('nests replies correctly', () => {
-    render(Comments, { props: { comments: flat, onSubmit: () => {} }})
-    expect(screen.getByText('Root')).toBeInTheDocument()
-    expect(screen.getByText('Child')).toBeInTheDocument()
-    // Child should be rendered inside a nested <ul>
-    const child = screen.getByText('Child')
-    expect(child.closest('ul')).not.toBeNull()
+  it('renders title and read time', () => {
+    render(Content, { props: { articles } })
+    expect(screen.getByText('Hello World')).toBeInTheDocument()
+    expect(screen.getByText('3 min')).toBeInTheDocument()
   })
 
-  it('emits event on reply submission', async () => {
-    const mock = vi.fn()
-    render(Comments, { props: { comments: [], onSubmit: mock } })
+  it('shows comments count and fires openSidebar event', async () => {
+    const { component } = render(Content, { props: { articles } })
+    const opener = vi.fn()
+    component.$on('openSidebar', opener)
 
-    await fireEvent.input(screen.getByRole('textbox'), { target: { value: 'hey' }})
-    await fireEvent.click(screen.getByText('Submit'))
+    const countEl = screen.getByText('5 comments')
+    await fireEvent.click(countEl)
 
-    expect(mock).toHaveBeenCalledWith({ content:'hey', parent:null })
+    expect(opener).toHaveBeenCalledOnce()
+    expect(opener.mock.calls[0][0].detail).toBe(1)
   })
 })

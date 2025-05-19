@@ -1,53 +1,59 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import {
-  fetchArticles,
-  fetchComments,
-  postComment,
-  deleteComment,
-} from '../lib/api'
+// frontend/src/__tests__/api.spec.ts
+import { describe, it, expect, vi } from 'vitest'
+import * as api from '../lib/api'
+
+global.fetch = vi.fn()
 
 describe('api.ts', () => {
-  beforeEach(() => {
-    global.fetch = vi.fn()
+  afterEach(() => {
+    vi.resetAllMocks()
   })
 
-  it('fetchArticles calls correct URL and returns JSON', async () => {
-    const mock = { response: { docs: [1,2] } }
-    ;(global.fetch as any).mockResolvedValue({ json: () => Promise.resolve(mock) })
+  it('fetches articles from /api/ucdavis-news', async () => {
+    const mockData = { data: [{ id: 1, title: 'Test Article' }] }
+    // @ts-ignore
+    fetch.mockResolvedValueOnce({ json: () => Promise.resolve(mockData) })
 
-    const result = await fetchArticles()
-    expect(global.fetch).toHaveBeenCalledWith(
-      `${import.meta.env.VITE_BASE_URL || ''}/api/ucdavis-news`,
-      { credentials: 'include' }
-    )
-    expect(result).toEqual(mock)
+    const result = await api.fetchArticles()
+    expect(fetch).toHaveBeenCalledWith('/api/ucdavis-news', { credentials: 'include' })
+    expect(result).toEqual(mockData)     // ← expect the full object
   })
 
-  it('fetchComments calls with article_id', async () => {
-    const mock = ['a','b']
-    ;(global.fetch as any).mockResolvedValue({ json: () => Promise.resolve(mock) })
+  it('fetches comments for a given article', async () => {
+    const mockComments = { data: [{ id: 2, text: 'Hi' }] }
+    // @ts-ignore
+    fetch.mockResolvedValueOnce({ json: () => Promise.resolve(mockComments) })
 
-    const data = await fetchComments('XYZ')
-    expect(global.fetch).toHaveBeenCalledWith(
-      `${import.meta.env.VITE_BASE_URL || ''}/api/comments?article_id=XYZ`,
-      { credentials: 'include' }
-    )
-    expect(data).toEqual(mock)
+    const result = await api.fetchComments('123')
+    expect(fetch).toHaveBeenCalledWith('/api/comments?article_id=123', { credentials: 'include' })
+    expect(result).toEqual(mockComments)  // ← and here, too
   })
 
-  it('postComment and deleteComment use correct methods', async () => {
-    ;(global.fetch as any).mockResolvedValue({ json: () => Promise.resolve({ ok: true }) })
+  it('posts a comment', async () => {
+    const mockResp = { success: true }
+    // @ts-ignore
+    fetch.mockResolvedValueOnce({ json: () => Promise.resolve(mockResp) })
 
-    await postComment('A1','hello')
-    expect(global.fetch).toHaveBeenLastCalledWith(
-      `${import.meta.env.VITE_BASE_URL || ''}/api/comments`,
-      expect.objectContaining({ method: 'POST' })
+    const result = await api.postComment('123', 'Hello!')
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/comments',
+      expect.objectContaining({
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article_id: '123', content: 'Hello!' })
+      })
     )
+    expect(result).toEqual(mockResp)
+  })
 
-    await deleteComment('CID123')
-    expect(global.fetch).toHaveBeenLastCalledWith(
-      `${import.meta.env.VITE_BASE_URL || ''}/api/comments/CID123`,
-      expect.objectContaining({ method: 'DELETE' })
+  it('deletes a comment', async () => {
+    // @ts-ignore
+    fetch.mockResolvedValueOnce({})
+    await api.deleteComment('987')
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/comments/987',
+      { method: 'DELETE', credentials: 'include' }
     )
   })
 })

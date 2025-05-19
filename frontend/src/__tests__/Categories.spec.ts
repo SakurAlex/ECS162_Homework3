@@ -1,17 +1,25 @@
-import { vi } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/svelte'
+// frontend/src/__tests__/Categories.spec.ts
+import { render, screen } from '@testing-library/svelte'
+import { describe, it, expect } from 'vitest'
 import Categories from '../Categories.svelte'
 
-const cats = ['News','Opinion','Sports']
-
 describe('Categories.svelte', () => {
-  it('renders all categories and highlights selected', async () => {
-    render(Categories, { props: { categories: cats, selected: 'News', onSelect: vi.fn() } })
-    cats.forEach(c => expect(screen.getByText(c)).toBeInTheDocument())
+  const sample = ['News', 'Tech', 'Sports']
 
-    const sportBtn = screen.getByText('Sports')
-    expect(sportBtn).not.toHaveClass('active')
-    await fireEvent.click(sportBtn)
-    expect(sportBtn).toHaveClass('active')
+  it('renders all categories and highlights the active one', () => {
+    render(Categories, {
+      props: {
+        categories: sample,
+        activeCategory: 'Tech'
+      }
+    })
+
+    // every category label shows up…
+    sample.forEach((cat) => {
+      expect(screen.getByText(cat)).toBeInTheDocument()
+    })
+
+    // …and 'Tech' has the active marker
+    expect(screen.getByText('Tech')).toHaveClass('active')
   })
 })

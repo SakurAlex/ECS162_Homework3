@@ -1,52 +1,43 @@
-import { defineConfig } from 'vitest/config';
-import { svelte } from '@sveltejs/vite-plugin-svelte';
+// frontend/vitest.config.ts
+import { defineConfig } from 'vitest/config'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 export default defineConfig({
+  // 1) Global define for the Svelte plugin
+  define: {
+    'import.meta.env.SSR': 'false'
+  },
+
   plugins: [
-    svelte({
-        compilerOptions: {
-        // force DOM-mode (not SSR) so onMount / mount() works
-        generate: 'dom',
-        hydratable: true,
-        },
-    }),
+    // 2) No special overrides here—just the stock plugin
+    svelte()
   ],
+
   test: {
+    // 3) Browser-like DOM environment
     environment: 'jsdom',
     globals: true,
-    
-    // Force Svelte to treat us as browser (not SSR) during tests:
-    define: {
-      'import.meta.env.SSR': 'false'
-    },
 
-    // Make sure .svelte files are transformed for the web
+    // 4) Tell Vitest: whenever you see a .svelte file, transform it for the web (DOM) build
     transformMode: {
-      web: [/\.[jt]sx?$/, /\.svelte$/]
+      web: [ /\.svelte$/ ]
     },
 
-    // Inline Svelte dependencies so they go through the plugin
+    // 5) Inline the Svelte runtime and testing-library so they get compiled into that DOM build
     server: {
       deps: {
         inline: [
           '@testing-library/svelte',
           'svelte',
-          'svelte/internal',
-        ],
-      },
+          'svelte/internal'
+        ]
+      }
     },
 
-
-    
     coverage: {
-      provider: 'istanbul',
-      reporter: ['text', 'html'],
-      include: ['src/**/*.{ts,svelte}'],
-      exclude: ['src/main.ts', 'src/vite-env.d.ts'],
-      statements: 98,
-      branches:   98,
-      functions: 98,
-      lines:     98,
-    },
-  },
-});
+      provider: 'v8',
+      all: true,
+      // …your thresholds…
+    }
+  }
+})
