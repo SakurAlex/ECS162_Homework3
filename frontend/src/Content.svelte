@@ -737,27 +737,21 @@ if (span) span.textContent = String(data.length);
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div class="article">
-      <!-- Image -->
+    <div>
+
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
+        <!-- Image -->
       </figure>
-      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-       <!-- Read time -->
+      <!-- Full summary -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-
-        <!-- Comment button: non-user cannot comment -->
-        <button class="comment" disabled={!user} on:click={() => {
-          if (!user) {
-            alert("Please login to comment!");
-            return;
-          }
-        }}>
+        <!-- Read time -->
+        <button class="comment">
           <img src={comment} alt="comment" />
           <span class="comment-count"></span>
         </button>
@@ -871,13 +865,13 @@ if (span) span.textContent = String(data.length);
     height: 2rem;
     min-width: 3.5rem;
     background-color: white;
+    font-family: "Newsreader", serif;
     justify-content: space-between;
     border: 1px solid #beb3b3;
     border-radius: 15px;
   }
   .comment-box button {
     align-self: flex-end;
-    font-family: "Newsreader", serif;
   }
 
   .comment img {
