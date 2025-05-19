@@ -4,7 +4,7 @@
   import { onMount, getContext, setContext } from "svelte";
   import comment from "./assets/comment.svg";
   import Comments from "./Comments.svelte";
-  
+  //User information, type required by the typescript
   type User = { email: string; name: string };
   let user: User | null = null;
   let showSidebar = false;
@@ -12,29 +12,40 @@
   let currentaid = "";
   //The array of comments
   let comments: any[] = [];
+  //The new comment input for the user
   let newComment = "";
   let textareaFocused = false;
+  //The number of comments
   let commentCount = 0;
 
+  // $ ensure that the commentCount is updated whenever the comments are updated
   $: {
+    //To count the number of comments that are not removed by the moderator
     commentCount = comments.filter(c => !c.removed).length;
   }
-
+  //To set the user context
   $: if (user) {
     setContext("user", user);
     console.log("Setting user context:", user);
   }
 
+  /*
+   * This function loads the user information.
+   *
+   * @returns {Promise<void>} - A promise that resolves when the user information is loaded.
+   */
   function loadUser() {
     fetch(`${BASE_URL}/api/userinfo`, {
       credentials: 'include'
     })
+    //To check if the user is loaded
     .then(res => {
       if (!res.ok) {
         throw new Error('Failed to load user');
       }
       return res.json();
     })
+    //To log the user information
     .then(data => {
       console.log("User info from backend:", data);
       console.log("User name:", data.name);
@@ -49,10 +60,14 @@
     });
   }
 
+  //To set the loadComments function to the context
+  //Type required by the typescript
   type LoadCommentsFunction = (article_id: string) => void;
   setContext<LoadCommentsFunction>('loadComments', loadComments);
   
-  //Fetch data when component mounts
+  /*
+   * This function loads the user information and the articles.
+   */
   onMount(() => {
     loadUser();
     fetch(`${BASE_URL}/api/ucdavis-news`, {credentials: 'include'})
@@ -62,6 +77,12 @@
       .catch(handleError); // Handle any fetch errors
   });
 
+  /*
+   * This function loads the comments for a given article.
+   *
+   * @param {string} article_id - The ID of the article to load comments for.
+   * @returns {Promise<void>} - A promise that resolves when the comments are loaded.
+   */
   export function loadComments(article_id: string) {
     fetch(`${BASE_URL}/api/comments?article_id=${encodeURIComponent(article_id)}`, { credentials: 'include' })
       .then(statusCheck)
@@ -72,7 +93,14 @@
       })
       .catch(handleError);
   }
+
   //AI tool helps to give inspirations on how to nest the comments
+  /*
+   * This function nests the comments.
+   *
+   * @param {any[]} comments - The comments to nest.
+   * @returns {any[]} - The nested comments.
+   */
   function nestComments(comments: any[]) {
     const map = new Map();
     const nested = [];
@@ -92,6 +120,13 @@
 
   $: nestedComments = nestComments(comments); //To ensure that everytime the comments are updated, the nestedComments are updated
 
+  /*
+   * This function submits a comment.
+   *
+   * @param {string} content - The content of the comment.
+   * @param {string} parent - The parent of the comment.
+   * @returns {Promise<any>} - A promise that resolves when the comment is submitted.
+   */
   function submitComment(content: string, parent: string | null = null): Promise<any> {
     if (!content.trim()) return Promise.resolve();
 
@@ -113,8 +148,28 @@
     .catch(handleError);
   }
 
+/*
+ * This function fetches the number of comments for a given article and updates the comment count.
+ *
+ * @param {string} articleId - The ID of the article to fetch the comment count for.
+ * @returns {Promise<void>} - A promise that resolves when the comment count is fetched and updated.
+ */
+async function fetchCommentCount(articleId: string) {
+const res = await fetch(
+   `${BASE_URL}/api/comments?article_id=${encodeURIComponent(articleId)}`,
+   { credentials: "include" }
+);
+if (!res.ok) throw new Error(`Couldn't fetch comments for ${articleId}`);
+const data: any[] = await res.json();
+// find the <span class="comment-count"> under the button with matching data-article-id
+const span = document.querySelector(
+  `button.comment[data-article-id="${articleId}"] .comment-count`
+);
+if (span) span.textContent = String(data.length);
+}
+
   /**
-   * This function processes the data.
+   * This function processes the data from the backend (New York Times API).
    *
    * @param {any} data - The data from the fetch request.
    */
@@ -125,7 +180,7 @@
     const pictures = document.querySelectorAll(".picture"); // find all the <img> with class picture
     const articles = data.response.docs; // get the article list
     const readtime = document.querySelectorAll(".readtime"); // find all the <p> with class readtime
-    const comment = document.querySelectorAll(".comment"); // find all the <button> with class comment
+    const commentButtons = document.querySelectorAll("button.comment");
 
     console.log("abstracts.length: ", abstracts.length);
     for (let i = 0; i < abstracts.length; i++) {
@@ -151,12 +206,18 @@
           showSidebar = true;
           loadComments(article._id);
         });
-        comment[i].addEventListener("click", () => {
+        //set the data-article-id to the button
+        const btn = commentButtons[i] as HTMLButtonElement; 
+        btn.setAttribute("data-article-id", article._id); 
+        //set the click event to the button
+        btn.addEventListener("click", () => {
           currentTitle = titleText;
           currentaid = article._id;
           showSidebar = true;
           loadComments(article._id);
         });
+        //fetch the comment count
+        fetchCommentCount(article._id).catch(console.error);
 
         if (imageUrl) {
           (pictures[i] as HTMLImageElement).src = imageUrl;
@@ -204,22 +265,28 @@
   <!-- Left column: featured articles -->
   <section class="articles">
     <div class="article">
-
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -228,23 +295,29 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -253,23 +326,29 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -278,23 +357,29 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -303,27 +388,34 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
     </div>
+
   </section>
 
   <!-- The line that separates the left and middle columns -->
@@ -331,23 +423,29 @@
 
   <!-- Middle column: contain both images and text -->
   <section class="articles" id="middle">
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -356,23 +454,29 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -381,23 +485,29 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -406,23 +516,29 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -431,23 +547,29 @@
     <div class="hline"></div>
     <!-- Separator -->
 
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -460,23 +582,153 @@
 
   <!-- Right column: mosaic + opinion -->
   <aside class="articles" id="right-column">
-    <div>
-
+    <div class="article">
+      <!-- Image -->
       <figure class="images">
         <img class="picture" alt="Loading..." />
         
-        <!-- Image -->
       </figure>
+      <!-- Title and abstract -->
       <h2 class="title">Loading...</h2>
       <p class="abstract"></p>
 
-      <!-- Full summary -->
+       <!-- Read time -->
       <div class="readtime-comment">
         <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
           <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
+        </button>
+      </div>
+      
+    </div>
+
+    <div class="hline"></div>
+    <!-- Separator -->
+
+    <div class="article">
+      <!-- Image -->
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+      </figure>
+      <!-- Title and abstract -->
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+       <!-- Read time -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
+          <img src={comment} alt="comment" />
+          <span class="comment-count"></span>
+        </button>
+      </div>
+      
+    </div>
+
+    <div class="hline"></div>
+    <!-- Separator -->
+
+    <div class="article">
+      <!-- Image -->
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+      </figure>
+      <!-- Title and abstract -->
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+       <!-- Read time -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
+          <img src={comment} alt="comment" />
+          <span class="comment-count"></span>
+        </button>
+      </div>
+      
+    </div>
+
+    <div class="hline"></div>
+    <!-- Separator -->
+
+    <div class="article">
+      <!-- Image -->
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+      </figure>
+      <!-- Title and abstract -->
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+       <!-- Read time -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
+          <img src={comment} alt="comment" />
+          <span class="comment-count"></span>
+        </button>
+      </div>
+      
+    </div>
+
+    <div class="hline"></div>
+    <!-- Separator -->
+
+    <div class="article">
+      <!-- Image -->
+      <figure class="images">
+        <img class="picture" alt="Loading..." />
+        
+      </figure>
+      <!-- Title and abstract -->
+      <h2 class="title">Loading...</h2>
+      <p class="abstract"></p>
+
+       <!-- Read time -->
+      <div class="readtime-comment">
+        <p class="readtime"></p>
+
+        <!-- Comment button: non-user cannot comment -->
+        <button class="comment" disabled={!user} on:click={() => {
+          if (!user) {
+            alert("Please login to comment!");
+            return;
+          }
+        }}>
+          <img src={comment} alt="comment" />
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -501,107 +753,7 @@
         <!-- Read time -->
         <button class="comment">
           <img src={comment} alt="comment" />
-          <span class="comment-count"> 0</span>
-        </button>
-      </div>
-      
-    </div>
-
-    <div class="hline"></div>
-    <!-- Separator -->
-
-    <div>
-
-      <figure class="images">
-        <img class="picture" alt="Loading..." />
-        
-        <!-- Image -->
-      </figure>
-      <h2 class="title">Loading...</h2>
-      <p class="abstract"></p>
-
-      <!-- Full summary -->
-      <div class="readtime-comment">
-        <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
-          <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
-        </button>
-      </div>
-      
-    </div>
-
-    <div class="hline"></div>
-    <!-- Separator -->
-
-    <div>
-
-      <figure class="images">
-        <img class="picture" alt="Loading..." />
-        
-        <!-- Image -->
-      </figure>
-      <h2 class="title">Loading...</h2>
-      <p class="abstract"></p>
-
-      <!-- Full summary -->
-      <div class="readtime-comment">
-        <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
-          <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
-        </button>
-      </div>
-      
-    </div>
-
-    <div class="hline"></div>
-    <!-- Separator -->
-
-    <div>
-
-      <figure class="images">
-        <img class="picture" alt="Loading..." />
-        
-        <!-- Image -->
-      </figure>
-      <h2 class="title">Loading...</h2>
-      <p class="abstract"></p>
-
-      <!-- Full summary -->
-      <div class="readtime-comment">
-        <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
-          <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
-        </button>
-      </div>
-      
-    </div>
-
-    <div class="hline"></div>
-    <!-- Separator -->
-
-    <div>
-
-      <figure class="images">
-        <img class="picture" alt="Loading..." />
-        
-        <!-- Image -->
-      </figure>
-      <h2 class="title">Loading...</h2>
-      <p class="abstract"></p>
-
-      <!-- Full summary -->
-      <div class="readtime-comment">
-        <p class="readtime"></p>
-        <!-- Read time -->
-        <button class="comment">
-          <img src={comment} alt="comment" />
-          <span class="comment-count">0</span>
+          <span class="comment-count"></span>
         </button>
       </div>
       
@@ -619,7 +771,7 @@
     <div class="sidebar" on:click|stopPropagation role="dialog">
 
       <div class="sidebar-header">
-        <p>{currentTitle} <span class="comment-count">{commentCount}</span></p>
+        <p>{currentTitle}</p>
         <button class="close-btn" on:click={toggleSidebar}>&times;</button>
       </div>
 
@@ -643,7 +795,7 @@
           </div>
         </div>
         {#each nestComments(comments).reverse() as comment}
-          <Comments {comment} {submitComment} />
+          <Comments {comment} {comments} {submitComment} />
         {/each}
       </div>
     </div>
@@ -713,6 +865,7 @@
     height: 2rem;
     min-width: 3.5rem;
     background-color: white;
+    font-family: "Newsreader", serif;
     justify-content: space-between;
     border: 1px solid #beb3b3;
     border-radius: 15px;
@@ -814,7 +967,7 @@
   .close-btn {
     font-size: 2rem;
     cursor: pointer;
-    background-color: none;
+    background-color: white;
     border: none;
     padding: 0.5rem;
   }
@@ -829,6 +982,7 @@
 
   .sidebar-content h3 {
     font-size: 1.5rem;
+    font-family: "Newsreader", serif;
     font-weight: bold;
     margin-bottom: 1rem;
   }
@@ -838,6 +992,7 @@
 
   .comment-buttons {
     display: flex;
+    justify-content: flex-end;
     gap: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
@@ -846,22 +1001,25 @@
   #submit {
     background-color: #5c7b95;
     color: white;
-    border: 1px solid black;
-    padding: 0.4rem 1rem;
-    border-radius: 5px;
-    font-size: 0.9rem;
+    border: none;
+    padding: 0.4rem;
+    border-radius: 8px;
+    font-size: 0.9rem; 
+    font-weight: bold;
+    font-family: "Gabarito", sans-serif;
     cursor: pointer;
     position: flex-end;
   }
 
   #cancel {
-    background-color: #e4dfdf;
+    background-color: #ffffff;
     color: black;
-    border: 1px solid black;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 5px;
+    border: 1px solid grey;
+    padding: 0.4rem;
+    border-radius: 8px;
     font-size: 0.9rem;
+    font-weight: bold;
+    font-family: "Gabarito", sans-serif;
     cursor: pointer;
     position: flex-end;
   }

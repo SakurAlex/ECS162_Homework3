@@ -94,6 +94,7 @@ def login():
     redirect_uri = 'http://localhost:8000/authorize'
     return oauth.flask_app.authorize_redirect(redirect_uri, nonce=nonce)
 
+# authorize the user admin/moderator/user
 @app.route('/authorize')
 def authorize():
     token = oauth.flask_app.authorize_access_token()
@@ -103,6 +104,7 @@ def authorize():
     session['user'] = user_info
     return redirect('http://localhost:5173/')
 
+# logout the user, clear the session
 @app.route('/logout')
 def logout():
     session.clear()
@@ -117,6 +119,7 @@ def get_news():
     data['response']['docs'].extend(requests.get(url + "&page=1").json()['response']['docs']) # Combine page 0 and page 1
     return jsonify(data) # Return JSON to client
 
+# get the comments from the mongoDB database
 @app.route("/api/comments")
 def get_comments():
     article_id = request.args.get("article_id") # get the article_id from the frontend request
@@ -128,6 +131,7 @@ def get_comments():
         out.append(c)
     return jsonify(out)
 
+# post the comment to the mongoDB database
 @app.route("/api/comments", methods=["POST"])
 @require_login
 def post_comment():
@@ -150,7 +154,8 @@ def post_comment():
     comment["_id"] = str(res.inserted_id)
     return jsonify(comment), 201
 
-@app.route("/api/comments/<cid>", methods=["DELETE"])
+# delete method to delete the comment as admin and moderator
+@app.route("/api/comments/<cid>", methods=["DELETE"]) # it requires <cid> as a parameter
 @require_login
 def delete_comment(cid):
     info = session["user"]
@@ -168,9 +173,32 @@ def delete_comment(cid):
     
     if result.modified_count == 0:
         abort(404)  # Comment not found
-        
     return "", 204
 
+# put method to update only parts of the comment
+@app.route("/api/comments/<cid>", methods=["PUT"]) # it requires <cid> as a parameter
+@require_login
+def redact_comment(cid):
+    info = session["user"]
+    if info.get("name") not in ["admin", "moderator"]:
+        abort(403)
+
+    data = request.get_json() # get the content from the frontend
+    content = data.get("content", "").strip()
+    if not content:
+        abort(400)
+
+    # replace the selected text with a full block (U+2588).
+    redacted = ''.join('█' if c != ' ' else ' ' for c in content)
+
+    # update the content of the comment in the mongodb database
+    mongo.db.comments.update_one(
+        {"_id": ObjectId(cid)},
+        {"$set": {"content": redacted, "removed": False}}
+    )
+    return jsonify({"status": "redacted"}), 200
+    
+# get the article from the NYT API
 @app.route('/api/article/<article_id>')
 def get_article(article_id):
     try:

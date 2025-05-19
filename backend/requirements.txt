@@ -7,3 +7,4 @@ requests==2.31.0
 Werkzeug==2.0.1
 pytest==7.4.0
 flask-pymongo
+pytest-cov
