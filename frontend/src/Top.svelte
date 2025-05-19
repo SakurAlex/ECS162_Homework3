@@ -1,44 +1,60 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { setContext } from 'svelte';
+  import { onMount, setContext } from "svelte";
   import search from './assets/search.svg';
-  const baseUrl = import.meta.env.VITE_BASE_URL ?? 'http://localhost:8000';
-
-  //User state & auth actions
-  let user: { email: string; groups?: string[] } | null = null;
+  const BASE_URL = "http://localhost:8000";
+  type User = { email: string; name: string };
+  let user: User | null = null;
   let showSidebar = false;
 
-  async function loadUser() {
-    //Using AI to help me to solve the problem of the page not working after refresh
-    try {
-      const res = await fetch(
-        `${baseUrl}/api/userinfo`,
-        { credentials: 'include' }
-      );
-      if (res.ok) {
-        user = await res.json();
-        setContext('user', user);  // set the user as user context
-      } else if (res.status === 401) {
-        user = null;
-        setContext('user', null);
-      } else {
-        console.error('Failed to fetch user info:', await res.text());
-      }
-    } catch (error) {
-      console.error('Error loading user:', error);
-    }
+  /**
+   * Set the user context for the app
+   */
+  $: if (user) {
+    setContext("user", user);
   }
+
+  /**
+   * Load the user info from the backend
+   */
+  function loadUser() {
+    fetch(`${BASE_URL}/api/userinfo`, {
+      credentials: 'include'
+    })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Failed to load user');
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("User info from backend:", data);
+      if (data && data.email) {
+        user = data;
+      }
+    })
+    .catch((error) => {
+      console.error("Error loading user:", error);
+      user = null;
+    });
+  }
+
+  /**
+   * Toggle the sidebar
+   */
   function toggleSidebar() {
     showSidebar = !showSidebar;
   }
 
+  /**
+   * Login the user
+   */
   function login() {
-    window.location.href = `${baseUrl}/login`;
+    window.location.href = `${BASE_URL}/login`;
   }
   //To ensure the user is logged out, I need to clear the session and redirect to the home page
   async function logout() {
     toggleSidebar();
-    const response = await fetch(`${baseUrl}/logout`, {credentials: 'include'});
+    const response = await fetch(`${BASE_URL}/logout`, {credentials: 'include'});
     if (response.ok) {
       user = null;
       setContext('user', null);
@@ -46,9 +62,9 @@
     }
   }
 
- 
-
-  onMount(loadUser);
+  onMount(() => {
+    loadUser();
+  });
 </script>
 
 <div id="top"> <!-- Top bar -->
@@ -155,7 +171,7 @@ button {
     font-style: normal;
     cursor: pointer; /* Interactive cursor */
 }
-
+/* Style for the account button */
 #account {  
   color: black;
   font-size: 1rem;
@@ -178,6 +194,7 @@ button {
   justify-content: flex-end;
 }
 
+/* Style for the sidebar */
 .sidebar {
   width: 400px;
   height: 100%;
@@ -189,6 +206,7 @@ button {
   position: flex;
 }
 
+/* Style for the sidebar header */
 .sidebar-header {
   padding: 1rem;
   font-size: 1.2rem;
@@ -207,6 +225,7 @@ button {
   padding: 0.5rem;
 }
 
+/* Style for the sidebar content */
 .sidebar-content {
   font-size: 2.5rem;
   padding: 2rem;
@@ -214,6 +233,7 @@ button {
   flex-grow: 1;
 }
 
+/* Style for the logout button */
 #logout {
   color: #333;
   font-size: 1.7rem;

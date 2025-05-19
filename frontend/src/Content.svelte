@@ -771,7 +771,7 @@ if (span) span.textContent = String(data.length);
     <div class="sidebar" on:click|stopPropagation role="dialog">
 
       <div class="sidebar-header">
-        <p>{currentTitle} <span class="comment-count">{commentCount}</span></p>
+        <p>{currentTitle}</p>
         <button class="close-btn" on:click={toggleSidebar}>&times;</button>
       </div>
 
@@ -795,7 +795,7 @@ if (span) span.textContent = String(data.length);
           </div>
         </div>
         {#each nestComments(comments).reverse() as comment}
-          <Comments {comment} {submitComment} />
+          <Comments {comment} {comments} {submitComment} />
         {/each}
       </div>
     </div>
@@ -982,6 +982,7 @@ if (span) span.textContent = String(data.length);
 
   .sidebar-content h3 {
     font-size: 1.5rem;
+    font-family: "Newsreader", serif;
     font-weight: bold;
     margin-bottom: 1rem;
   }
@@ -991,6 +992,7 @@ if (span) span.textContent = String(data.length);
 
   .comment-buttons {
     display: flex;
+    justify-content: flex-end;
     gap: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
@@ -999,22 +1001,25 @@ if (span) span.textContent = String(data.length);
   #submit {
     background-color: #5c7b95;
     color: white;
-    border: 1px solid black;
-    padding: 0.4rem 1rem;
-    border-radius: 5px;
-    font-size: 0.9rem;
+    border: none;
+    padding: 0.4rem;
+    border-radius: 8px;
+    font-size: 0.9rem; 
+    font-weight: bold;
+    font-family: "Gabarito", sans-serif;
     cursor: pointer;
     position: flex-end;
   }
 
   #cancel {
-    background-color: #e4dfdf;
+    background-color: #ffffff;
     color: black;
-    border: 1px solid black;
-    border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 5px;
+    border: 1px solid grey;
+    padding: 0.4rem;
+    border-radius: 8px;
     font-size: 0.9rem;
+    font-weight: bold;
+    font-family: "Gabarito", sans-serif;
     cursor: pointer;
     position: flex-end;
   }

@@ -146,7 +146,7 @@
 </script>
 
 <!-- Comment display and interaction UI -->
-<div class="comment-item">
+<div class="comment-item" class:has-parent={comment.parent}>
   <!-- User name and comment content -->
   <p class="user-name">{comment.user}</p>
   <p class="content" class:removed={comment.removed}>{comment.content}</p>
@@ -163,23 +163,26 @@
       <!-- Redact input form -->
       <textarea bind:value={redactContent}></textarea>
       <div class="submit-and-cancel">
-        <button class="submit-button" on:click={handleRedact}>Confirm</button>
+        <button class="submit-button" on:click={handleRedact}>Submit</button>
         <button class="cancel-button" on:click={() => redacting = false}>Cancel</button>
       </div>
     {:else}
-      <!--if NOT replying or redacting, only reply redact and delete buttons are comment-actions-->
-      <div id="reply-and-redact">
-        <button class="reply-button" on:click={() => replying = true}>Reply</button>
-        {#if user && (user.email === 'moderator@hw3.com' || user.email === 'admin@hw3.com')}
-          <button class="redact-button" on:click={() => redacting = true}>Redact</button>
-        {/if}
+      <div class="reply-redact-delete">
+        <!--if NOT replying or redacting, only reply redact and delete buttons are comment-buttons-->
+        <div id="reply-and-redact">
+          <button class="reply-button" on:click={() => replying = true}>Reply</button>
+          {#if user && (user.email === 'moderator@hw3.com' || user.email === 'admin@hw3.com')}
+            <button class="redact-button" on:click={() => redacting = true}>Redact</button>
+          {/if}
+        </div>
+        <div id="delete-button">
+          <!-- Delete button (only visible to moderators and admins) -->
+          {#if user && (user.email === 'moderator@hw3.com' || user.email === 'admin@hw3.com')}
+            <button class="delete-button" on:click={() => deleteComment(comment._id)}>Delete</button>
+          {/if}
+        </div>
       </div>
-    {/if}
-  
-    <!-- Delete button (only visible to moderators and admins) -->
-    {#if user && (user.email === 'moderator@hw3.com' || user.email === 'admin@hw3.com')}
-      <button class="delete-button" on:click={() => deleteComment(comment._id)}>Delete</button>
-    {/if}
+    {/if}    
   </div>
 
   <!-- Recursive rendering of child comments -->
@@ -195,9 +198,13 @@
 <style>
   /* Comment container styling */
   .comment-item {
-    border-left: 2px solid #ddd;
-    margin-bottom: 1rem;
+    margin: 1rem;
+  }
+  /* Comment with parent has a border on the left */
+  .has-parent {
+    border-left: 1.5px solid #ddd;
     padding-left: 1rem;
+    margin-left: 0.5rem;
   }
 
   /* Username styling */
@@ -205,50 +212,63 @@
     font-weight: bold;
     font-size: 0.95rem;
     display: inline-block;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.5rem;
   }
  
   /* Layout for action buttons */
-  .comment-buttons, .submit-and-cancel {
+  .comment-buttons {
     display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: white;
+    border: none;
     width: 100%;
-    justify-content: flex-start;
-    align-items: center;
     margin-top: 0.5rem;
   }
 
+  /* textarea */
+  .comment-buttons textarea {
+    width: 100%;
+    min-height: 30px;
+    margin-top: 4px;
+    font-size: 14px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
 
-  /* Base button styling */
-  .comment-item button {
-    background: none;
-    font-size: 0.85rem;
+  .submit-and-cancel {
+    margin-top: 5px;
+    display: flex;
+    gap: 20px;
+    justify-content: flex-end;
+  }
+  #reply-and-redact {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+  }
+
+  .reply-redact-delete {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .reply-button, .submit-button {
+    background-color: white;
     font-weight: bold;
     border: none;
-    cursor: pointer;
-    padding: 0;
+    color: #547994;
   }
 
-  /* Reply and submit button styling */
-  .reply-button, .submit-button {
-    font-size: 0.8rem;
-    padding: 4px 8px;
+  .redact-button, .delete-button, .cancel-button {  
+    background-color: white;
+    font-weight: bold;
     border: none;
-    border-radius: 6px;
-    margin-left: 8px;
-    color: #3b5998;
+    color: grey;
   }
-
-  /* Delete and cancel button styling */
-  .delete-button, .cancel-button {
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    border: none;
-    border-radius: 6px;
-    margin-left: 8px;
-    color: white;
-    border: grey;
-  }
-
   /* Comment text styling */
   .comment-item p {
     font-size: 0.9rem;

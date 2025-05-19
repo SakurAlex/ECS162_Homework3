@@ -94,6 +94,7 @@ def login():
     redirect_uri = 'http://localhost:8000/authorize'
     return oauth.flask_app.authorize_redirect(redirect_uri, nonce=nonce)
 
+# authorize the user admin/moderator/user
 @app.route('/authorize')
 def authorize():
     token = oauth.flask_app.authorize_access_token()
@@ -103,6 +104,7 @@ def authorize():
     session['user'] = user_info
     return redirect('http://localhost:5173/')
 
+# logout the user, clear the session
 @app.route('/logout')
 def logout():
     session.clear()
@@ -117,6 +119,7 @@ def get_news():
     data['response']['docs'].extend(requests.get(url + "&page=1").json()['response']['docs']) # Combine page 0 and page 1
     return jsonify(data) # Return JSON to client
 
+# get the comments from the mongoDB database
 @app.route("/api/comments")
 def get_comments():
     article_id = request.args.get("article_id") # get the article_id from the frontend request
@@ -128,6 +131,7 @@ def get_comments():
         out.append(c)
     return jsonify(out)
 
+# post the comment to the mongoDB database
 @app.route("/api/comments", methods=["POST"])
 @require_login
 def post_comment():
@@ -194,7 +198,7 @@ def redact_comment(cid):
     )
     return jsonify({"status": "redacted"}), 200
     
-
+# get the article from the NYT API
 @app.route('/api/article/<article_id>')
 def get_article(article_id):
     try:
