@@ -90,3 +90,5 @@ It really helped me a lot, and I finished coding by his instruction very easiely
 
 Because of the lack of experience in pytest, asked chatgpt how to build it, and debugged with him.
 asked chatgpt how to show the code coverages of my unit test, and I got responde that use the pytest_cov tool, I added it in my requirements file and it works really well, it indeed helped me a lot, and I defnitely will keep this in mind in the future, really helpful.
+
+I wrote the vitest at first but it keep giving me errors, so I tried to let chatgpt helping me to build the vitest for the frontend, but it now working great, failed a lot only a few of them will pass the test, and I tried a long time to fixin git, but by the due time, I still not be able to finish it.
