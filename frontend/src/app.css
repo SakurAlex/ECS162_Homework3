@@ -1,0 +1,49 @@
+/* Reset default spacing and ensure consistent box sizing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Default link styling: remove underline and use black text */
+a {
+  text-decoration: none;
+  color: black;
+}
+
+/* Container rule for direct children of body: center content with max widths */
+body > *{
+  margin: 2px auto;
+  width: 1200px;
+  max-width: 95%;
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+}
+
+/* Tablet breakpoint: hide sidebar and right divider, adjust logo and line colors */
+@media (max-width: 1024px) {
+  #right-column, #lineright {
+    display: none; /* Hide sidebar and right vertical line */
+  }
+  #vline {
+      background-color: white;
+  }
+  #logo figure {
+      margin-left: auto;
+      margin-right: auto;
+  }
+}
+
+/* Mobile breakpoint: further hide elements for narrow screens */
+@media (max-width: 767px) {
+  #lineleft {
+    display: none; /* Hide left vertical divider */
+  }    
+  #vline {
+    display: none; /* Hide main vertical separator */
+  }
+  #middle, #languages, #trend, #date {
+    display: none; /* Hide middle column and top-bar items */
+  }
+}
+
